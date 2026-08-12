@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { Search, ChevronRight, BookOpen, DollarSign, TrendingUp, Sparkles, ExternalLink } from 'lucide-react';
-import { DEMO_SEO_OPPORTUNITIES } from '@/lib/growth/demo-growth-data';
 
 export default function SEOCommandPage() {
   return (
@@ -36,31 +35,13 @@ export default function SEOCommandPage() {
             SOURCE IP REPURPOSING & ORGANIC NET REVENUE ATTRIBUTION
           </div>
           <div className="space-y-3">
-            {DEMO_SEO_OPPORTUNITIES.map(seo => (
-              <div key={seo.id} className="bg-[#121418] border border-white/5 rounded-lg p-4 flex items-center justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-3">
-                    <span className="font-display text-sm font-bold text-[#F5F6F7]">{seo.topicTitle}</span>
-                    <span className="text-[9px] text-[#D6A84B] font-bold">Score: {seo.opportunityScore}/100</span>
-                  </div>
-                  <div className="text-[10px] text-[#626770]">Source: {seo.sourceChapter} · Intent: {seo.searchIntent}</div>
-                </div>
-
-                <div className="flex items-center gap-6 text-[10px]">
-                  <div>
-                    <span className="text-[#626770]">Sessions: </span>
-                    <strong className="text-[#38BDF8]">{seo.organicSessions.toLocaleString()}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[#626770]">Attributed Net: </span>
-                    <strong className="text-[#22C55E]">£{seo.organicNetRevenueGbp.toLocaleString()}</strong>
-                  </div>
-                  <button className="bg-[#1C1F24] hover:bg-white/10 text-[#38BDF8] font-display text-[9px] font-bold px-3 py-1.5 rounded border border-[#38BDF8]/30">
-                    REPURPOSE ARTICLE
-                  </button>
-                </div>
+            <div className="bg-[#121418] border border-white/5 rounded-lg p-8 flex flex-col items-center justify-center text-center space-y-3 industrial-panel">
+              <Search className="w-8 h-8 text-[#38BDF8]" />
+              <div className="font-display text-sm font-bold text-[#F5F6F7]">NO REAL SEO DATA AVAILABLE</div>
+              <div className="text-[10px] text-[#626770] max-w-md">
+                Cannot display SEO opportunities. Requires connection to Google Search Console or Analytics APIs to determine real organic traffic and attributed revenue.
               </div>
-            ))}
+            </div>
           </div>
         </div>
 

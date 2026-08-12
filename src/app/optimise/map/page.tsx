@@ -2,22 +2,14 @@
 
 import React, { useState } from 'react';
 import OptimiseShell from '@/components/optimise/OptimiseShell';
-import { DEMO_OPTIMISATION_COVERAGE, DEMO_OPTIMISATION_MAP } from '@/lib/optimise/demo-optimise-data';
 
 export default function OptimisationMapPage() {
   const [selectedCell, setSelectedCell] = useState<string | null>(null);
 
-  const coverageData = [
-    { name: 'Pricing', value: 68 },
-    { name: 'Creative', value: 46 },
-    { name: 'Distribution', value: 35 },
-    { name: 'Positioning', value: 22 },
-    { name: 'Bundles', value: 14 },
-    { name: 'Localisation', value: 8 },
-  ];
+  const coverageData: any[] = [];
 
-  const products = ['How to Trade', 'Quiet Edge', 'HTT German'];
-  const marketplaces = ['Gumroad UK', 'Etsy US', 'Payhip UK', 'Gumroad DE'];
+  const products: string[] = [];
+  const marketplaces: string[] = [];
 
   return (
     <OptimiseShell header="OPTIMISATION MAP" description="Visual coverage of commercial optimization across the portfolio.">
@@ -27,6 +19,12 @@ export default function OptimisationMapPage() {
         <div className="bg-gradient-to-b from-[#17191E] to-[#121418] border border-white/10 rounded-xl p-6">
           <h2 className="font-display text-[#F5F6F7] text-lg font-bold tracking-[0.08em] mb-6">COVERAGE PROGRESS</h2>
           <div className="space-y-4">
+            {coverageData.length === 0 && (
+              <div className="flex flex-col items-center justify-center p-8 text-center bg-[#0A0B0D] border border-white/10 rounded-lg">
+                <div className="text-[#D6A84B] font-display text-xs tracking-widest mb-2">NO COVERAGE DATA</div>
+                <div className="text-white/50 text-sm font-data max-w-md">Sync your commerce catalogue and testing platform to generate accurate coverage metrics.</div>
+              </div>
+            )}
             {coverageData.map((item) => (
               <div key={item.name} className="flex items-center gap-4">
                 <span className="w-32 text-sm font-display text-[#A2A6AD] tracking-[0.08em] uppercase">{item.name}</span>
@@ -55,6 +53,16 @@ export default function OptimisationMapPage() {
               </tr>
             </thead>
             <tbody>
+              {products.length === 0 && (
+                <tr>
+                  <td colSpan={marketplaces.length > 0 ? marketplaces.length + 1 : 1} className="p-8 text-center">
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="text-[#38BDF8] font-display text-xs tracking-widest mb-2">NO PRODUCTS OR MARKETPLACES</div>
+                      <div className="text-white/50 text-sm font-data max-w-md">Connect your storefront to populate the testing matrix.</div>
+                    </div>
+                  </td>
+                </tr>
+              )}
               {products.map((product, i) => (
                 <tr key={product} className="border-b border-white/5 last:border-0">
                   <td className="p-3 font-display text-sm text-[#F5F6F7] whitespace-nowrap">{product}</td>

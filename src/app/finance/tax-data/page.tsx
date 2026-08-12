@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ShieldCheck, ChevronRight, FileText, Download, Lock } from 'lucide-react';
-import { DEMO_TAX_RECORDS } from '@/lib/finance/demo-finance-data';
+
 
 export default function TaxDataPage() {
   return (
@@ -36,33 +36,14 @@ export default function TaxDataPage() {
             MERCHANT OF RECORD & TAX WITHHELD TELEMETRY (REPORTING SUPPORT LAYER — NOT TAX ADVICE)
           </div>
           <div className="space-y-3">
-            {DEMO_TAX_RECORDS.map(tax => (
-              <div key={tax.id} className="bg-[#121418] border border-white/5 rounded-lg p-4 flex items-center justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-3">
-                    <span className="font-display text-sm font-bold text-[#F5F6F7]">{tax.marketplaceName} ({tax.territoryCode})</span>
-                    <span className="text-[9px] text-[#38BDF8] font-bold border border-[#38BDF8]/30 px-2 py-0.5 rounded bg-[#38BDF8]/10">
-                      {tax.merchantOfRecord}
-                    </span>
-                  </div>
-                  <div className="text-[10px] text-[#626770]">Period: {tax.periodLabel} · Status: {tax.taxStatus}</div>
-                </div>
 
-                <div className="flex items-center gap-6 text-[10px]">
-                  <div>
-                    <span className="text-[#626770]">Tax Collected: </span>
-                    <strong className="text-[#F5F6F7]">£{tax.taxCollectedGbp}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[#626770]">Tax Withheld: </span>
-                    <strong className="text-[#22C55E]">£{tax.taxWithheldGbp}</strong>
-                  </div>
-                  <button className="bg-[#1C1F24] hover:bg-white/10 text-[#38BDF8] font-display text-[9px] font-bold px-3 py-1.5 rounded border border-[#38BDF8]/30">
-                    DOWNLOAD STATEMENT
-                  </button>
-                </div>
+            <div className="bg-[#121418] border border-white/5 rounded-lg p-8 flex flex-col items-center justify-center text-center space-y-3 industrial-panel">
+              <ShieldCheck className="w-8 h-8 text-[#38BDF8]" />
+              <div className="font-display text-sm font-bold text-[#F5F6F7]">NO REAL TAX DATA AVAILABLE</div>
+              <div className="text-[10px] text-[#626770] max-w-md">
+                Cannot display tax telemetry. Requires connection to real Merchant of Record (MoR) systems or configured tax calculation APIs.
               </div>
-            ))}
+            </div>
           </div>
         </div>
 

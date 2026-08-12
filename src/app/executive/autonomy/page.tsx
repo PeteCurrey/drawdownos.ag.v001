@@ -3,11 +3,11 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import ExecutiveShell from '@/components/executive/ExecutiveShell';
-import { DEMO_PREFERENCES, DEMO_GUARDRAILS } from '@/lib/executive/demo-executive-data';
+
 
 export default function AutonomyPage() {
   const pathname = usePathname();
-  const currentMode = DEMO_PREFERENCES.autonomyMode;
+  const currentMode = "ADVISER";
 
   const getGuardrailTypeColor = (type: string) => {
     switch (type) {
@@ -49,33 +49,10 @@ export default function AutonomyPage() {
         <div className="industrial-panel p-6">
           <h2 className="text-[#F5F6F7] font-display text-sm mb-6">GUARDRAILS</h2>
           <div className="space-y-3 mb-8">
-            {DEMO_GUARDRAILS.map(guardrail => (
-              <div key={guardrail.id} className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-[#1C1F24] border border-white/5 rounded gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-1">
-                    <span className={`text-[9px] font-display px-2 py-0.5 rounded border ${getGuardrailTypeColor(guardrail.type)}`}>
-                      {guardrail.type.replace('_', ' ')}
-                    </span>
-                    <h4 className="text-[#F5F6F7] font-bold text-sm">{guardrail.name}</h4>
-                  </div>
-                  <p className="text-[#A2A6AD] text-xs">{guardrail.description}</p>
-                </div>
-                
-                <div className="flex items-center gap-6">
-                  {guardrail.value !== undefined && (
-                    <div className="text-right">
-                      <span className="text-[#626770] font-data text-[10px] block">LIMIT</span>
-                      <span className="text-[#F5F6F7] font-data font-bold">
-                        {typeof guardrail.value === 'number' && guardrail.type === 'FINANCIAL_LIMIT' ? `£${guardrail.value}` : guardrail.value}
-                      </span>
-                    </div>
-                  )}
-                  <button className={`w-10 h-5 rounded-full relative transition-colors ${guardrail.isActive ? 'bg-[#D6A84B]' : 'bg-[#121418] border border-white/20'}`}>
-                    <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-[#0A0B0D] transition-all ${guardrail.isActive ? 'left-5.5 right-0.5' : 'left-0.5'}`} style={guardrail.isActive ? { left: '22px' } : { left: '2px' }} />
-                  </button>
-                </div>
-              </div>
-            ))}
+            <div className="industrial-panel p-6 text-center border-dashed border-2 border-white/10">
+              <h3 className="text-[#D6A84B] font-display text-sm font-bold mb-2">NO DATA CONNECTED</h3>
+              <p className="text-[#A2A6AD] text-sm">This module requires an active database connection or platform integration to display real data. Fake data is prohibited.</p>
+            </div>
           </div>
 
           <div className="border-2 border-[#EF4444]/30 bg-[#EF4444]/5 p-5 rounded-lg">
@@ -96,20 +73,19 @@ export default function AutonomyPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="p-4 bg-[#1C1F24] rounded border border-white/5">
               <span className="text-[#626770] text-[10px] font-display uppercase block mb-1">Tasks Automated</span>
-              <span className="text-[#F5F6F7] font-data text-2xl font-bold">67</span>
+              <span className="text-[#F5F6F7] font-data text-2xl font-bold">—</span>
             </div>
             <div className="p-4 bg-[#1C1F24] rounded border border-white/5">
               <span className="text-[#626770] text-[10px] font-display uppercase block mb-1">Hours Avoided</span>
-              <span className="text-[#38BDF8] font-data text-2xl font-bold">14.2h</span>
+              <span className="text-[#38BDF8] font-data text-2xl font-bold">—</span>
             </div>
             <div className="p-4 bg-[#1C1F24] rounded border border-white/5">
               <span className="text-[#626770] text-[10px] font-display uppercase block mb-1">Value Created (Est.)</span>
-              <span className="text-[#22C55E] font-data text-2xl font-bold">£2,840</span>
+              <span className="text-[#22C55E] font-data text-2xl font-bold">—</span>
             </div>
             <div className="p-4 bg-[#1C1F24] rounded border border-white/5">
               <span className="text-[#626770] text-[10px] font-display uppercase block mb-1">Success Rate</span>
-              <span className="text-[#D6A84B] font-data text-2xl font-bold">95.5%</span>
-              <span className="text-[#A2A6AD] text-[10px] block mt-1">3 failures (escalated)</span>
+              <span className="text-[#D6A84B] font-data text-2xl font-bold">—</span>
             </div>
           </div>
         </div>

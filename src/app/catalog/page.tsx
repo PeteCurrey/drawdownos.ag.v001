@@ -17,22 +17,14 @@ import {
   Layers,
   ArrowRight
 } from 'lucide-react';
-import { DEMO_PUBLICATIONS_CATALOG, Publication } from '@/lib/demo-data';
+
 
 export default function CatalogPage() {
   const [viewMode, setViewMode] = useState<'Grid' | 'Table' | 'Status' | 'Commercial'>('Grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
-  const filteredPublications = DEMO_PUBLICATIONS_CATALOG.filter(pub => {
-    const matchesSearch = 
-      pub.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      pub.canonicalId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      pub.category.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'ALL' || pub.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const filteredPublications: any[] = [];
 
   return (
     <div className="space-y-6 pb-12">
@@ -112,71 +104,81 @@ export default function CatalogPage() {
       {/* Grid View */}
       {viewMode === 'Grid' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredPublications.map(pub => (
-            <div key={pub.id} className="industrial-panel p-5 flex flex-col justify-between group hover:border-[#D6A84B]/40 transition-all">
-              
-              {/* Publication Header */}
-              <div>
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="font-data text-xs font-bold text-[#D6A84B] px-2 py-0.5 bg-[#D6A84B]/10 rounded border border-[#D6A84B]/20">
-                      {pub.canonicalId}
-                    </span>
-                    <span className="text-[10px] font-data text-[#626770]">v{pub.version}</span>
-                  </div>
-
-                  <span className={`text-[10px] font-display px-2 py-0.5 rounded border uppercase ${
-                    pub.status === 'LIVE' ? 'bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/30' : 'bg-[#D6A84B]/10 text-[#D6A84B] border-[#D6A84B]/30'
-                  }`}>
-                    {pub.status}
-                  </span>
-                </div>
-
-                <h3 className="font-display text-base text-[#F5F6F7] font-bold mt-3 group-hover:text-[#D6A84B] transition-colors">
-                  {pub.title}
-                </h3>
-                <p className="text-xs text-[#A2A6AD] font-data mt-1 line-clamp-2">
-                  {pub.subtitle}
-                </p>
+          {filteredPublications.length === 0 ? (
+            <div className="col-span-full industrial-panel p-8 flex flex-col items-center justify-center text-center space-y-3">
+              <AlertTriangle className="w-8 h-8 text-[#D6A84B]" />
+              <div className="font-display text-sm font-bold text-[#F5F6F7]">NO REAL CATALOG DATA AVAILABLE</div>
+              <div className="text-[10px] text-[#626770] max-w-md">
+                Cannot display publications. Requires active connection to a real inventory system or CMS to list canonical publications.
               </div>
-
-              {/* Publication Telemetry Details */}
-              <div className="mt-5 space-y-3 pt-4 border-t border-white/10 font-data text-xs">
-                
-                <div className="grid grid-cols-2 gap-2 text-[11px]">
-                  <div className="industrial-panel-inset p-2">
-                    <span className="text-[#626770] block text-[9px] font-display">FORMATS</span>
-                    <span className="text-[#F5F6F7] font-bold">{pub.formatCount} Commercial</span>
-                  </div>
-                  <div className="industrial-panel-inset p-2">
-                    <span className="text-[#626770] block text-[9px] font-display">CHANNELS</span>
-                    <span className="text-[#22C55E] font-bold">{pub.liveMarketplaces} Live Stores</span>
-                  </div>
-                  <div className="industrial-panel-inset p-2">
-                    <span className="text-[#626770] block text-[9px] font-display">LIFETIME UNITS</span>
-                    <span className="text-[#F5F6F7] font-bold">{pub.lifetimeUnits.toLocaleString()}</span>
-                  </div>
-                  <div className="industrial-panel-inset p-2">
-                    <span className="text-[#626770] block text-[9px] font-display">LIFETIME REVENUE</span>
-                    <span className="text-[#D6A84B] font-bold">£{pub.lifetimeRevenue.toLocaleString()}</span>
-                  </div>
-                </div>
-
-                {/* Footer Controls */}
-                <div className="flex items-center justify-between pt-2 text-[10px] text-[#626770]">
-                  <span>Updated: {pub.lastUpdate.split(' ')[0]}</span>
-                  <Link 
-                    href={`/catalog/${pub.canonicalId}`}
-                    className="text-[#D6A84B] hover:underline font-display flex items-center gap-1 font-bold"
-                  >
-                    COMMAND SUITE <ArrowRight className="w-3 h-3" />
-                  </Link>
-                </div>
-
-              </div>
-
             </div>
-          ))}
+          ) : (
+            filteredPublications.map(pub => (
+              <div key={pub.id} className="industrial-panel p-5 flex flex-col justify-between group hover:border-[#D6A84B]/40 transition-all">
+                
+                {/* Publication Header */}
+                <div>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className="font-data text-xs font-bold text-[#D6A84B] px-2 py-0.5 bg-[#D6A84B]/10 rounded border border-[#D6A84B]/20">
+                        {pub.canonicalId}
+                      </span>
+                      <span className="text-[10px] font-data text-[#626770]">v{pub.version}</span>
+                    </div>
+
+                    <span className={`text-[10px] font-display px-2 py-0.5 rounded border uppercase ${
+                      pub.status === 'LIVE' ? 'bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/30' : 'bg-[#D6A84B]/10 text-[#D6A84B] border-[#D6A84B]/30'
+                    }`}>
+                      {pub.status}
+                    </span>
+                  </div>
+
+                  <h3 className="font-display text-base text-[#F5F6F7] font-bold mt-3 group-hover:text-[#D6A84B] transition-colors">
+                    {pub.title}
+                  </h3>
+                  <p className="text-xs text-[#A2A6AD] font-data mt-1 line-clamp-2">
+                    {pub.subtitle}
+                  </p>
+                </div>
+
+                {/* Publication Telemetry Details */}
+                <div className="mt-5 space-y-3 pt-4 border-t border-white/10 font-data text-xs">
+                  
+                  <div className="grid grid-cols-2 gap-2 text-[11px]">
+                    <div className="industrial-panel-inset p-2">
+                      <span className="text-[#626770] block text-[9px] font-display">FORMATS</span>
+                      <span className="text-[#F5F6F7] font-bold">{pub.formatCount} Commercial</span>
+                    </div>
+                    <div className="industrial-panel-inset p-2">
+                      <span className="text-[#626770] block text-[9px] font-display">CHANNELS</span>
+                      <span className="text-[#22C55E] font-bold">{pub.liveMarketplaces} Live Stores</span>
+                    </div>
+                    <div className="industrial-panel-inset p-2">
+                      <span className="text-[#626770] block text-[9px] font-display">LIFETIME UNITS</span>
+                      <span className="text-[#F5F6F7] font-bold">{pub.lifetimeUnits.toLocaleString()}</span>
+                    </div>
+                    <div className="industrial-panel-inset p-2">
+                      <span className="text-[#626770] block text-[9px] font-display">LIFETIME REVENUE</span>
+                      <span className="text-[#D6A84B] font-bold">£{pub.lifetimeRevenue.toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  {/* Footer Controls */}
+                  <div className="flex items-center justify-between pt-2 text-[10px] text-[#626770]">
+                    <span>Updated: {pub.lastUpdate.split(' ')[0]}</span>
+                    <Link 
+                      href={`/catalog/${pub.canonicalId}`}
+                      className="text-[#D6A84B] hover:underline font-display flex items-center gap-1 font-bold"
+                    >
+                      COMMAND SUITE <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+
+                </div>
+
+              </div>
+            ))
+          )}
         </div>
       )}
 
@@ -197,33 +199,47 @@ export default function CatalogPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {filteredPublications.map(pub => (
-                <tr key={pub.id} className="hover:bg-[#17191E] transition-colors">
-                  <td className="p-3 font-bold text-[#D6A84B]">{pub.canonicalId}</td>
-                  <td className="p-3">
-                    <div className="font-bold text-[#F5F6F7]">{pub.title}</div>
-                    <div className="text-[10px] text-[#626770]">{pub.category}</div>
-                  </td>
-                  <td className="p-3">
-                    <span className="px-2 py-0.5 rounded text-[10px] bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/30 font-display">
-                      {pub.status}
-                    </span>
-                  </td>
-                  <td className="p-3 text-[#F5F6F7]">{pub.formatCount} Formats</td>
-                  <td className="p-3 text-[#22C55E]">{pub.liveMarketplaces} Channels</td>
-                  <td className="p-3 text-[#D6A84B] font-bold">£{pub.lifetimeRevenue.toLocaleString()}</td>
-                  <td className="p-3">
-                    <span className="text-[10px] text-[#22C55E] font-bold flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3" /> PASSED
-                    </span>
-                  </td>
-                  <td className="p-3 text-right">
-                    <Link href={`/catalog/${pub.canonicalId}`} className="text-[#D6A84B] hover:underline font-display font-bold text-[11px]">
-                      OPEN →
-                    </Link>
+              {filteredPublications.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="p-8 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <AlertTriangle className="w-8 h-8 text-[#D6A84B]" />
+                      <div className="font-display text-sm font-bold text-[#F5F6F7]">NO REAL CATALOG DATA AVAILABLE</div>
+                      <div className="text-[10px] text-[#626770] max-w-md">
+                        Cannot display publications. Requires active connection to a real inventory system or CMS to list canonical publications.
+                      </div>
+                    </div>
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredPublications.map(pub => (
+                  <tr key={pub.id} className="hover:bg-[#17191E] transition-colors">
+                    <td className="p-3 font-bold text-[#D6A84B]">{pub.canonicalId}</td>
+                    <td className="p-3">
+                      <div className="font-bold text-[#F5F6F7]">{pub.title}</div>
+                      <div className="text-[10px] text-[#626770]">{pub.category}</div>
+                    </td>
+                    <td className="p-3">
+                      <span className="px-2 py-0.5 rounded text-[10px] bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/30 font-display">
+                        {pub.status}
+                      </span>
+                    </td>
+                    <td className="p-3 text-[#F5F6F7]">{pub.formatCount} Formats</td>
+                    <td className="p-3 text-[#22C55E]">{pub.liveMarketplaces} Channels</td>
+                    <td className="p-3 text-[#D6A84B] font-bold">£{pub.lifetimeRevenue.toLocaleString()}</td>
+                    <td className="p-3">
+                      <span className="text-[10px] text-[#22C55E] font-bold flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3" /> PASSED
+                      </span>
+                    </td>
+                    <td className="p-3 text-right">
+                      <Link href={`/catalog/${pub.canonicalId}`} className="text-[#D6A84B] hover:underline font-display font-bold text-[11px]">
+                        OPEN →
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

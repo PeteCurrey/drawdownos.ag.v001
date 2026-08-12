@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { OptimiseShell } from '@/components/optimise/OptimiseShell';
-// import { DEMO_EXPERIMENTS } from '@/lib/optimise/demo-optimise-data';
+
 // import { Experiment } from '@/lib/optimise/types';
 
 export default function WinnerLibraryPage() {

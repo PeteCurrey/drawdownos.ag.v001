@@ -4,9 +4,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import {
   BookOpen, ChevronRight, Search, Plus, Languages, ShieldCheck,
-  CheckCircle2, AlertTriangle, Lock
+  CheckCircle2, AlertTriangle, Lock, Database
 } from 'lucide-react';
-import { DRAWDOWN_TERM_BASE, TRANSLATION_MEMORY } from '@/lib/localisation/demo-localisation-data';
 
 export default function TerminologyStudio() {
   const [activeTab, setActiveTab] = useState<string>('ALL TERMS');
@@ -40,10 +39,10 @@ export default function TerminologyStudio() {
         {/* Stats */}
         <div className="grid grid-cols-4 gap-3 font-data text-xs">
           {[
-            { label: 'TERM BASE ENTRIES', value: DRAWDOWN_TERM_BASE.length, color: '#D6A84B' },
-            { label: 'TRANSLATION MEMORY', value: TRANSLATION_MEMORY.length, color: '#22C55E' },
-            { label: 'LOCKED BRAND TERMS', value: DRAWDOWN_TERM_BASE.filter(t => t.classification === 'LOCKED').length, color: '#818CF8' },
-            { label: 'TERMINOLOGY CONFLICTS', value: '0', color: '#22C55E' },
+            { label: 'TERM BASE ENTRIES', value: '--', color: '#D6A84B' },
+            { label: 'TRANSLATION MEMORY', value: '--', color: '#22C55E' },
+            { label: 'LOCKED BRAND TERMS', value: '--', color: '#818CF8' },
+            { label: 'TERMINOLOGY CONFLICTS', value: '--', color: '#22C55E' },
           ].map(s => (
             <div key={s.label} className="bg-[#0E1014] border border-white/8 rounded-xl p-3 space-y-1">
               <div className="text-[9px] text-[#626770] tracking-wider">{s.label}</div>
@@ -75,38 +74,12 @@ export default function TerminologyStudio() {
           <div className="font-display text-xs tracking-wider text-[#626770] pb-2 border-b border-white/5">
             DRAWDOWN TERM BASE & REGIONAL TRANSLATIONS
           </div>
-          <div className="divide-y divide-white/5">
-            {DRAWDOWN_TERM_BASE.map(tb => (
-              <div key={tb.id} className="py-3.5 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="font-display text-sm font-bold text-[#F5F6F7]">{tb.termEn}</span>
-                    <span className="text-[9px] px-2 py-0.5 rounded border border-white/10 text-[#818CF8]">{tb.category}</span>
-                    {tb.classification === 'LOCKED' && (
-                      <span className="text-[9px] text-[#D6A84B] font-bold bg-[#D6A84B]/10 px-2 py-0.5 rounded border border-[#D6A84B]/30 flex items-center gap-1">
-                        <Lock className="w-3 h-3" /> BRAND LOCKED
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-[10px] text-[#626770]">{tb.id}</span>
-                </div>
-                <div className="text-[10px] text-[#626770] italic">{tb.definition}</div>
-                <div className="grid grid-cols-3 gap-2 font-mono text-[10px] pt-1">
-                  <div className="bg-[#121418] p-2 rounded border border-white/5">
-                    <span className="text-[#626770]">de-DE: </span>
-                    <strong className="text-[#22C55E]">{tb.translations['de-DE']?.preferred}</strong>
-                  </div>
-                  <div className="bg-[#121418] p-2 rounded border border-white/5">
-                    <span className="text-[#626770]">es-ES: </span>
-                    <strong className="text-[#22C55E]">{tb.translations['es-ES']?.preferred}</strong>
-                  </div>
-                  <div className="bg-[#121418] p-2 rounded border border-white/5">
-                    <span className="text-[#626770]">pt-BR: </span>
-                    <strong className="text-[#22C55E]">{tb.translations['pt-BR']?.preferred}</strong>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="p-8 text-center space-y-3 industrial-panel">
+            <Database className="w-6 h-6 text-[#626770] mx-auto" />
+            <div className="font-display text-sm text-[#F5F6F7]">NO TERM BASE CONNECTED</div>
+            <div className="text-xs text-[#626770] max-w-md mx-auto">
+              Please connect your Translation Memory and Terminology Database to view, add, or manage terms and translations.
+            </div>
           </div>
         </div>
 

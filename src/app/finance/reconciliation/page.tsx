@@ -3,15 +3,11 @@
 import React from 'react';
 import Link from 'next/link';
 import { CheckCircle2, ChevronRight, AlertTriangle, ShieldCheck, DollarSign } from 'lucide-react';
-import { DEMO_PAYOUTS, DEMO_BANK_TRANSACTIONS } from '@/lib/finance/demo-finance-data';
+
 import { reconcilePayoutWithBank } from '@/lib/finance/reconciliation-engine';
 
 export default function ReconciliationWorkbenchPage() {
-  const reconItems = DEMO_PAYOUTS.map(p => {
-    const bankTx = DEMO_BANK_TRANSACTIONS.find(bt => bt.matchedPayoutId === p.id);
-    const result = reconcilePayoutWithBank(p, bankTx);
-    return { payout: p, bankTx, result };
-  });
+  const reconItems: any[] = [];
 
   return (
     <div className="min-h-screen bg-[#0A0B0D] text-[#F5F6F7] p-6">
@@ -43,35 +39,45 @@ export default function ReconciliationWorkbenchPage() {
             EXPECTED PAYOUT vs MARKETPLACE STATEMENT vs BANK CASH RECEIVED
           </div>
           <div className="space-y-3">
-            {reconItems.map(({ payout, bankTx, result }) => (
-              <div key={payout.id} className="bg-[#121418] border border-white/5 rounded-lg p-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="font-display text-sm font-bold text-[#F5F6F7]">{payout.marketplaceName} ({payout.periodLabel})</div>
-                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${result.matchConfidence === 'HIGH' ? 'text-[#22C55E] bg-[#22C55E]/10 border-[#22C55E]/30' : result.matchConfidence === 'MEDIUM' ? 'text-[#D6A84B] bg-[#D6A84B]/10 border-[#D6A84B]/30' : 'text-[#EF4444] bg-[#EF4444]/10 border-[#EF4444]/30'}`}>
-                    CONFIDENCE: {result.matchConfidence}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4 font-mono text-[10px]">
-                  <div className="bg-[#0E1014] p-3 rounded border border-white/5">
-                    <div className="text-[#626770]">1. EXPECTED RECEIVABLE</div>
-                    <div className="text-[#D6A84B] font-bold text-sm">£{payout.netExpectedGbp.toLocaleString()}</div>
-                  </div>
-                  <div className="bg-[#0E1014] p-3 rounded border border-white/5">
-                    <div className="text-[#626770]">2. MARKETPLACE REPORTED</div>
-                    <div className="text-[#38BDF8] font-bold text-sm">£{payout.netExpectedGbp.toLocaleString()}</div>
-                  </div>
-                  <div className="bg-[#0E1014] p-3 rounded border border-white/5">
-                    <div className="text-[#626770]">3. BANK RECEIVED CASH</div>
-                    <div className="text-[#22C55E] font-bold text-sm">£{bankTx ? bankTx.amountGbp.toLocaleString() : '0.00'}</div>
-                  </div>
-                </div>
-
-                <div className="text-[10px] text-[#626770] italic">
-                  Variance: <strong className={result.varianceGbp === 0 ? 'text-[#22C55E]' : 'text-[#EF4444]'}>£{result.varianceGbp}</strong> — {result.varianceExplanation}
+            {reconItems.length === 0 ? (
+              <div className="bg-[#121418] border border-white/5 rounded-lg p-8 flex flex-col items-center justify-center text-center space-y-3 industrial-panel">
+                <AlertTriangle className="w-8 h-8 text-[#D6A84B]" />
+                <div className="font-display text-sm font-bold text-[#F5F6F7]">NO REAL RECONCILIATION DATA AVAILABLE</div>
+                <div className="text-[10px] text-[#626770] max-w-md">
+                  Cannot perform 3-sided reconciliation. Connect bank feeds (e.g., Plaid, TrueLayer) and marketplace statement APIs to verify incoming cash.
                 </div>
               </div>
-            ))}
+            ) : (
+              reconItems.map(({ payout, bankTx, result }) => (
+                <div key={payout.id} className="bg-[#121418] border border-white/5 rounded-lg p-4 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="font-display text-sm font-bold text-[#F5F6F7]">{payout.marketplaceName} ({payout.periodLabel})</div>
+                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${result.matchConfidence === 'HIGH' ? 'text-[#22C55E] bg-[#22C55E]/10 border-[#22C55E]/30' : result.matchConfidence === 'MEDIUM' ? 'text-[#D6A84B] bg-[#D6A84B]/10 border-[#D6A84B]/30' : 'text-[#EF4444] bg-[#EF4444]/10 border-[#EF4444]/30'}`}>
+                      CONFIDENCE: {result.matchConfidence}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4 font-mono text-[10px]">
+                    <div className="bg-[#0E1014] p-3 rounded border border-white/5">
+                      <div className="text-[#626770]">1. EXPECTED RECEIVABLE</div>
+                      <div className="text-[#D6A84B] font-bold text-sm">£{payout.netExpectedGbp.toLocaleString()}</div>
+                    </div>
+                    <div className="bg-[#0E1014] p-3 rounded border border-white/5">
+                      <div className="text-[#626770]">2. MARKETPLACE REPORTED</div>
+                      <div className="text-[#38BDF8] font-bold text-sm">£{payout.netExpectedGbp.toLocaleString()}</div>
+                    </div>
+                    <div className="bg-[#0E1014] p-3 rounded border border-white/5">
+                      <div className="text-[#626770]">3. BANK RECEIVED CASH</div>
+                      <div className="text-[#22C55E] font-bold text-sm">£{bankTx ? bankTx.amountGbp.toLocaleString() : '0.00'}</div>
+                    </div>
+                  </div>
+
+                  <div className="text-[10px] text-[#626770] italic">
+                    Variance: <strong className={result.varianceGbp === 0 ? 'text-[#22C55E]' : 'text-[#EF4444]'}>£{result.varianceGbp}</strong> — {result.varianceExplanation}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 

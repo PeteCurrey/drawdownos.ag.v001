@@ -3,7 +3,7 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import ExecutiveShell from '@/components/executive/ExecutiveShell';
-import { DEMO_PREFERENCES } from '@/lib/executive/demo-executive-data';
+
 
 export default function SettingsPage() {
   const pathname = usePathname();
@@ -117,11 +117,11 @@ export default function SettingsPage() {
           
           <div className="space-y-6">
             {[
-              { key: 'impact', label: 'Impact Weight', val: DEMO_PREFERENCES.priorityWeights.impact, desc: 'Favours high financial impact.' },
-              { key: 'confidence', label: 'Confidence Weight', val: DEMO_PREFERENCES.priorityWeights.confidence, desc: 'Favours verified data.' },
-              { key: 'urgency', label: 'Urgency Weight', val: DEMO_PREFERENCES.priorityWeights.urgency, desc: 'Favours time-critical items.' },
-              { key: 'strategicFit', label: 'Strategic Fit Weight', val: DEMO_PREFERENCES.priorityWeights.strategicFit, desc: 'Favours alignment with CEO goals.' },
-              { key: 'leverage', label: 'Leverage Weight', val: DEMO_PREFERENCES.priorityWeights.leverage, desc: 'Favours high ROI / reusable outputs.' }
+              { key: 'impact', label: 'Impact Weight', val: 0.35, desc: 'Favours high financial impact.' },
+              { key: 'confidence', label: 'Confidence Weight', val: 0.25, desc: 'Favours verified data.' },
+              { key: 'urgency', label: 'Urgency Weight', val: 0.15, desc: 'Favours time-critical items.' },
+              { key: 'strategicFit', label: 'Strategic Fit Weight', val: 0.15, desc: 'Favours alignment with CEO goals.' },
+              { key: 'leverage', label: 'Leverage Weight', val: 0.10, desc: 'Favours high ROI / reusable outputs.' }
             ].map(w => (
               <div key={w.key}>
                 <div className="flex justify-between items-center mb-2">

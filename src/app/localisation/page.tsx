@@ -5,14 +5,8 @@ import Link from 'next/link';
 import {
   Globe, Languages, MapPin, Cpu, ShieldCheck, AlertTriangle,
   CheckCircle2, Clock, ChevronRight, Zap, ArrowRight, TrendingUp,
-  BarChart3, FlaskConical, History, Eye, Play, Sparkles, Filter
+  BarChart3, FlaskConical, History, Eye, Play, Sparkles, Filter, Database
 } from 'lucide-react';
-import {
-  LOCALISED_EDITIONS, TERRITORIES, LOCALES, LOCALISATION_OPPORTUNITIES,
-  TRANSLATION_MEMORY, DRAWDOWN_TERM_BASE
-} from '@/lib/localisation/demo-localisation-data';
-import { calculateLocalisationRSA, runExpandWinners } from '@/lib/localisation/flagship-actions';
-import { simulateLocaleUnlock } from '@/lib/localisation/opportunity-engine';
 
 function stateColor(state: string): string {
   const map: Record<string, string> = {
@@ -40,14 +34,10 @@ export default function LocalisationCommandCentre() {
   const [activeTab, setActiveTab] = useState<'territories' | 'opportunities' | 'editions' | 'simulators'>('territories');
   const [simLocale, setSimLocale] = useState<'de-DE' | 'es-ES' | 'pt-BR'>('de-DE');
 
-  const locRsa = calculateLocalisationRSA(64.0);
-  const winnersPlan = runExpandWinners();
-  const simResult = simulateLocaleUnlock(simLocale);
-
-  const totalEditions = LOCALISED_EDITIONS.length;
-  const liveEditions = LOCALISED_EDITIONS.filter(e => e.state === 'LIVE').length;
-  const inReviewEditions = LOCALISED_EDITIONS.filter(e => ['EDITORIAL_REVIEW', 'COMPLIANCE_REVIEW', 'VISUAL_QA'].includes(e.state)).length;
-  const inTranslationEditions = LOCALISED_EDITIONS.filter(e => ['TRANSLATING', 'TRANSLATED_DRAFT', 'PREPARING'].includes(e.state)).length;
+  const totalEditions = 0;
+  const liveEditions = 0;
+  const inReviewEditions = 0;
+  const inTranslationEditions = 0;
 
   return (
     <div className="min-h-screen bg-[#0A0B0D] text-[#F5F6F7] p-6">
@@ -85,14 +75,14 @@ export default function LocalisationCommandCentre() {
         {/* ── TOP HERO INSTRUMENTATION ── */}
         <div className="grid grid-cols-8 gap-3">
           {[
-            { label: 'ACTIVE LOCALES', value: `${LOCALES.filter(l => l.isActive).length}`, icon: Globe, color: '#38BDF8' },
-            { label: 'LIVE EDITIONS', value: `${liveEditions}/${totalEditions}`, icon: CheckCircle2, color: '#22C55E' },
-            { label: 'IN TRANSLATION', value: `${inTranslationEditions}`, icon: Clock, color: '#D6A84B' },
-            { label: 'IN REVIEW', value: `${inReviewEditions}`, icon: AlertTriangle, color: '#F97316' },
-            { label: 'OPPORTUNITIES', value: `${LOCALISATION_OPPORTUNITIES.length}`, icon: Sparkles, color: '#818CF8' },
-            { label: 'TM ENTRIES', value: `${TRANSLATION_MEMORY.length}`, icon: Languages, color: '#22C55E' },
-            { label: 'LOCAL RSA', value: `${locRsa.localisedRsaPct}%`, icon: Globe, color: '#D6A84B' },
-            { label: 'RSA UNLOCKABLE', value: `+${locRsa.additionalUnlockableLocalRsaPts} pts`, icon: TrendingUp, color: '#22C55E' },
+            { label: 'ACTIVE LOCALES', value: '--', icon: Globe, color: '#38BDF8' },
+            { label: 'LIVE EDITIONS', value: '--/--', icon: CheckCircle2, color: '#22C55E' },
+            { label: 'IN TRANSLATION', value: '--', icon: Clock, color: '#D6A84B' },
+            { label: 'IN REVIEW', value: '--', icon: AlertTriangle, color: '#F97316' },
+            { label: 'OPPORTUNITIES', value: '--', icon: Sparkles, color: '#818CF8' },
+            { label: 'TM ENTRIES', value: '--', icon: Languages, color: '#22C55E' },
+            { label: 'LOCAL RSA', value: '--%', icon: Globe, color: '#D6A84B' },
+            { label: 'RSA UNLOCKABLE', value: '-- pts', icon: TrendingUp, color: '#22C55E' },
           ].map(item => (
             <div key={item.label} className="bg-[#0E1014] border border-white/8 rounded-xl p-3 space-y-2">
               <div className="flex items-center justify-between">
@@ -145,110 +135,31 @@ export default function LocalisationCommandCentre() {
 
         {/* ── TAB CONTENT ── */}
         {activeTab === 'territories' && (
-          <div className="grid grid-cols-3 gap-4 font-data text-xs">
-            {TERRITORIES.map(ter => {
-              const localEditions = LOCALISED_EDITIONS.filter(e => e.territoryCode === ter.id);
-              return (
-                <div key={ter.id} className="bg-[#0E1014] border border-white/8 rounded-xl p-4 space-y-3">
-                  <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-display text-base font-bold text-[#F5F6F7]">{ter.name}</span>
-                      <span className="text-[10px] text-[#D6A84B] font-bold">({ter.id})</span>
-                    </div>
-                    <span className="text-[10px] text-[#38BDF8] font-bold">{ter.defaultCurrencyCode}</span>
-                  </div>
-
-                  <div className="space-y-1 text-[10px]">
-                    <div className="flex justify-between">
-                      <span className="text-[#626770]">Languages:</span>
-                      <span className="text-[#A2A6AD]">{ter.primaryLanguages.join(', ').toUpperCase()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#626770]">Regulatory Context:</span>
-                      <span className="text-[#22C55E] font-bold">{ter.regulatoryContext}</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className="text-[9px] text-[#626770] tracking-wider">LOCAL EDITIONS ({localEditions.length})</div>
-                    {localEditions.length > 0 ? (
-                      <div className="space-y-1">
-                        {localEditions.map(ed => (
-                          <div key={ed.id} className="flex items-center justify-between bg-[#121418] p-2 rounded border border-white/5 text-[10px]">
-                            <span className="text-[#F5F6F7] truncate max-w-44">{ed.titleLocalised}</span>
-                            <StatePill state={ed.state} />
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-[10px] text-[#626770] italic">No local editions created yet</div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+          <div className="bg-[#0E1014] border border-white/8 rounded-xl p-8 text-center space-y-3 industrial-panel font-data">
+            <Database className="w-6 h-6 text-[#626770] mx-auto" />
+            <div className="font-display text-sm text-[#F5F6F7]">NO REGIONAL DATA SOURCE CONNECTED</div>
+            <div className="text-xs text-[#626770] max-w-md mx-auto">
+              Territory matrices require a live connection to the CRM or region management database. Connect a data source to view active territories and compliance rules.
+            </div>
           </div>
         )}
 
         {activeTab === 'opportunities' && (
-          <div className="bg-[#0E1014] border border-white/8 rounded-xl overflow-hidden font-data text-xs">
-            <div className="px-4 py-3 border-b border-white/8 font-display text-xs tracking-wider text-[#A2A6AD]">RANKED LOCALISATION OPPORTUNITIES (WHAT LANGUAGE NEXT?)</div>
-            <div className="divide-y divide-white/5">
-              {LOCALISATION_OPPORTUNITIES.map((opp, i) => (
-                <div key={opp.id} className="p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold text-[#D6A84B] text-sm w-6">#{i + 1}</span>
-                    <div className="space-y-0.5">
-                      <div className="font-display text-sm font-bold text-[#F5F6F7]">{opp.localeName} ({opp.localeCode})</div>
-                      <div className="text-[10px] text-[#626770]">{opp.productName} ({opp.productSku})</div>
-                      {opp.existingSalesSignal && <div className="text-[9px] text-[#22C55E] italic">Signal: {opp.existingSalesSignal}</div>}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-6 text-[10px]">
-                    <div>
-                      <span className="text-[#626770]">Priority Score: </span>
-                      <strong className="text-[#D6A84B] font-bold text-sm">{opp.priorityScore}/100</strong>
-                    </div>
-                    <div>
-                      <span className="text-[#626770]">RSA Unlock: </span>
-                      <strong className="text-[#22C55E] font-bold text-sm">+{opp.rsaUnlockPts} pts</strong>
-                    </div>
-                    <div>
-                      <span className="text-[#626770]">Effort: </span>
-                      <strong className="text-[#F5F6F7]">{opp.estimatedEffort}</strong>
-                    </div>
-                    <StatePill state={opp.status} />
-                  </div>
-                </div>
-              ))}
+          <div className="bg-[#0E1014] border border-white/8 rounded-xl p-8 text-center space-y-3 industrial-panel font-data">
+            <Database className="w-6 h-6 text-[#626770] mx-auto" />
+            <div className="font-display text-sm text-[#F5F6F7]">OPPORTUNITY ENGINE DISCONNECTED</div>
+            <div className="text-xs text-[#626770] max-w-md mx-auto">
+              Ranked opportunities are calculated based on live sales signals and CRM data. Connect your telemetry pipeline to generate localisation priorities.
             </div>
           </div>
         )}
 
         {activeTab === 'editions' && (
-          <div className="bg-[#0E1014] border border-white/8 rounded-xl overflow-hidden font-data text-xs">
-            <div className="px-4 py-3 border-b border-white/8 flex items-center justify-between">
-              <span className="font-display text-xs tracking-wider text-[#A2A6AD]">LOCAL EDITIONS PIPELINE</span>
-              <Link href="/localisation/editions" className="font-display text-[10px] text-[#D6A84B]">MANAGE ALL EDITIONS →</Link>
-            </div>
-            <div className="divide-y divide-white/5 p-4 space-y-3">
-              {LOCALISED_EDITIONS.map(ed => (
-                <div key={ed.id} className="bg-[#121418] border border-white/5 rounded-lg p-4 flex items-center justify-between">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-3">
-                      <span className="font-display text-sm font-bold text-[#F5F6F7]">{ed.titleLocalised}</span>
-                      <StatePill state={ed.state} />
-                    </div>
-                    <div className="text-[10px] text-[#626770]">Locale: {ed.localeName} ({ed.localeCode}) · Canonical Source: {ed.sourceEditionId}</div>
-                  </div>
-                  <div className="flex items-center gap-4 text-[10px]">
-                    <span className="text-[#626770]">Completion: <strong className="text-[#22C55E]">{ed.completionPct}%</strong></span>
-                    <Link href={`/localisation/${ed.id}`} className="bg-[#1C1F24] hover:bg-white/10 text-[#D6A84B] px-3 py-1.5 rounded border border-[#D6A84B]/30 font-display text-[10px]">
-                      OPEN EDITION
-                    </Link>
-                  </div>
-                </div>
-              ))}
+          <div className="bg-[#0E1014] border border-white/8 rounded-xl p-8 text-center space-y-3 industrial-panel font-data">
+            <Database className="w-6 h-6 text-[#626770] mx-auto" />
+            <div className="font-display text-sm text-[#F5F6F7]">NO EDITIONS FOUND</div>
+            <div className="text-xs text-[#626770] max-w-md mx-auto">
+              The local editions pipeline requires a connection to the Translation Management System (TMS). Integrate your TMS to view active translation projects.
             </div>
           </div>
         )}
@@ -273,28 +184,12 @@ export default function LocalisationCommandCentre() {
               </div>
             </div>
 
-            <div className="grid grid-cols-4 gap-4">
-              <div className="bg-[#121418] p-3 rounded border border-white/5">
-                <div className="text-[#626770] text-[9px]">SIMULATED LOCALE</div>
-                <div className="text-[#F5F6F7] font-bold text-sm">{simResult.localeName}</div>
+            <div className="bg-[#121418] border border-dashed border-white/20 rounded-xl p-8 text-center space-y-3 industrial-panel">
+              <Database className="w-6 h-6 text-[#626770] mx-auto" />
+              <div className="font-display text-sm text-[#F5F6F7]">SIMULATION REQUIRES LIVE DATA</div>
+              <div className="text-xs text-[#626770] max-w-md mx-auto">
+                The Locale Unlock Simulator depends on live analytics and a connected opportunity engine to forecast RSA points and review hours.
               </div>
-              <div className="bg-[#121418] p-3 rounded border border-white/5">
-                <div className="text-[#626770] text-[9px]">RSA UNLOCK</div>
-                <div className="text-[#22C55E] font-bold text-sm">+{simResult.rsaUnlockPts} PTS</div>
-              </div>
-              <div className="bg-[#121418] p-3 rounded border border-white/5">
-                <div className="text-[#626770] text-[9px]">UNLOCKED MARKETPLACES</div>
-                <div className="text-[#38BDF8] font-bold text-xs">{simResult.unlockedMarketplaces.length} major channels</div>
-              </div>
-              <div className="bg-[#121418] p-3 rounded border border-white/5">
-                <div className="text-[#626770] text-[9px]">EST. REVIEW HOURS</div>
-                <div className="text-[#F97316] font-bold text-sm">{simResult.estimatedReviewHours} hrs</div>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="text-[9px] text-[#626770]">SIMULATION SUMMARY</div>
-              <div className="text-[#A2A6AD] bg-[#121418] p-3 rounded border border-white/5 italic">{simResult.summary}</div>
             </div>
           </div>
         )}

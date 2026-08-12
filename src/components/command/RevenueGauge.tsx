@@ -1,108 +1,134 @@
 'use client';
 
-import React from 'react';
-import { DollarSign, TrendingUp, Target, ArrowUpRight } from 'lucide-react';
-import { DEMO_TELEMETRY_METRICS } from '@/lib/demo-data';
+import React, { useState, useEffect } from 'react';
+import { BarChart3, TrendingUp, DollarSign, AlertCircle, RefreshCw } from 'lucide-react';
+import { getWhopPayments } from '@/lib/connectors/whop/client';
 
 export default function RevenueGauge() {
-  const metrics = DEMO_TELEMETRY_METRICS;
-  const pct = metrics.targetPercentage; // e.g. 68.42%
+  const [loading, setLoading] = useState(true);
+  const [whopConnected, setWhopConnected] = useState(false);
+  const [totalsByCurrency, setTotalsByCurrency] = useState<Record<string, number>>({});
+  const [totalOrdersCount, setTotalOrdersCount] = useState<number>(0);
+  const [statusMessage, setStatusMessage] = useState<string>('Awaiting marketplace data');
 
-  // SVG Gauge Calculations
-  const radius = 70;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (pct / 100) * (circumference * 0.75); // 270 degree arc
+  const loadRevenueData = async () => {
+    setLoading(true);
+    try {
+      const res = await getWhopPayments();
+      if (res.success && res.payments.length > 0) {
+        setWhopConnected(true);
+        setTotalOrdersCount(res.payments.length);
+
+        const currencyMap: Record<string, number> = {};
+        for (const p of res.payments) {
+          const curr = p.currency || 'USD';
+          currencyMap[curr] = (currencyMap[curr] || 0) + p.grossAmount;
+        }
+
+        setTotalsByCurrency(currencyMap);
+        setStatusMessage(`${res.payments.length} live Whop payment(s) imported`);
+      } else if (res.error) {
+        setStatusMessage(res.error);
+      } else {
+        setStatusMessage('No live transactions recorded on Whop');
+      }
+    } catch {
+      setStatusMessage('Whop connection unverified or awaiting credentials');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadRevenueData();
+  }, []);
+
+  const currencies = Object.keys(totalsByCurrency);
 
   return (
-    <div className="industrial-panel p-6 flex flex-col justify-between h-full min-h-[440px]">
+    <div className="industrial-panel p-6 relative overflow-hidden flex flex-col justify-between h-full min-h-[440px]">
       
-      {/* Panel Header */}
-      <div className="flex items-center justify-between border-b border-white/10 pb-3">
-        <div>
-          <span className="text-[9px] font-display text-[#D6A84B] tracking-widest block">TELEMETRY INSTRUMENT</span>
-          <h2 className="font-display text-base text-[#F5F6F7] tracking-wider">REVENUE ENGINE</h2>
+      {/* Title & Status */}
+      <div className="flex items-center justify-between gap-4 mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-[#1C1F24] border border-[#22C55E]/30 flex items-center justify-center text-[#22C55E] shadow-inner">
+            <DollarSign className="w-4 h-4" />
+          </div>
+          <div>
+            <h2 className="font-display text-base text-[#F5F6F7] tracking-wider">REVENUE ENGINE</h2>
+            <p className="text-[11px] font-data text-[#A2A6AD]">REAL COMMERCIAL PAYOUT & RECONCILIATION</p>
+          </div>
         </div>
-        <span className="text-[10px] font-data text-[#D6A84B] px-2 py-0.5 rounded bg-[#D6A84B]/10 border border-[#D6A84B]/20">
-          DEMO
-        </span>
+
+        <button 
+          onClick={loadRevenueData}
+          title="Refresh Live Revenue"
+          className="p-1.5 rounded-lg bg-[#0D0E11] border border-white/10 text-[#A2A6AD] hover:text-[#F5F6F7] transition-colors"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+        </button>
       </div>
 
-      {/* Main Gauge Dial Section */}
-      <div className="my-6 flex flex-col items-center justify-center relative">
+      {/* Primary Telemetry Displays */}
+      <div className="flex flex-col gap-4 my-auto py-2">
         
-        {/* SVG Arc Gauge */}
-        <div className="relative w-48 h-48 flex items-center justify-center">
-          <svg className="w-full h-full transform -rotate-135" viewBox="0 0 180 180">
-            {/* Background Arc */}
-            <circle
-              cx="90"
-              cy="90"
-              r={radius}
-              stroke="#1C1F24"
-              strokeWidth="14"
-              fill="transparent"
-              strokeDasharray={circumference * 0.75}
-              strokeLinecap="round"
-            />
-            {/* Foreground Metallic Gold Arc */}
-            <circle
-              cx="90"
-              cy="90"
-              r={radius}
-              stroke="#D6A84B"
-              strokeWidth="14"
-              fill="transparent"
-              strokeDasharray={circumference}
-              strokeDashoffset={strokeDashoffset}
-              strokeLinecap="round"
-              className="transition-all duration-1000 ease-out shadow-[0_0_12px_#D6A84B]"
-            />
-          </svg>
-
-          {/* Center Digital Telemetry Readout */}
-          <div className="absolute flex flex-col items-center justify-center text-center">
-            <span className="text-[10px] font-display text-[#A2A6AD]">MTD TARGET</span>
-            <div className="font-data text-3xl font-bold text-[#F5F6F7] tracking-tighter my-0.5">
-              {pct.toFixed(1)}%
+        {/* Real Native Currency Totals */}
+        <div className="bg-[#0D0E11] border border-white/10 rounded-xl p-5 shadow-xl">
+          <span className="text-[10px] font-display tracking-widest text-[#626770] uppercase block mb-1">
+            GROSS REVENUE RECORDED (MTD)
+          </span>
+          
+          {currencies.length > 0 ? (
+            <div className="flex flex-col gap-1">
+              {currencies.map(curr => (
+                <div key={curr} className="font-data text-2xl font-bold text-[#22C55E]">
+                  {curr} ${totalsByCurrency[curr]?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+              ))}
             </div>
-            <span className="text-[10px] font-data text-[#22C55E] flex items-center gap-0.5">
-              <ArrowUpRight className="w-3 h-3" /> +18.4% YoY
-            </span>
+          ) : (
+            <div className="font-data text-3xl font-bold text-[#F5F6F7]">
+              —
+            </div>
+          )}
+
+          <div className="text-[11px] font-data text-[#A2A6AD] mt-2 flex items-center gap-1.5">
+            <AlertCircle className="w-3.5 h-3.5 text-[#D6A84B]" />
+            <span>{statusMessage}</span>
           </div>
         </div>
 
-        {/* Big Numerical Readouts */}
-        <div className="w-full grid grid-cols-2 gap-3 mt-4 text-center">
-          <div className="industrial-panel-inset p-3">
-            <span className="text-[9px] font-display text-[#A2A6AD] block">REVENUE TODAY</span>
-            <span className="font-data text-xl font-bold text-[#22C55E]">
-              £{metrics.revenueToday.toLocaleString('en-GB', { minimumFractionDigits: 2 })}
-            </span>
+        {/* Supporting Metric Cards */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-[#0D0E11] border border-white/10 rounded-lg p-3">
+            <span className="text-[9px] font-display text-[#626770] uppercase block mb-1">ORDERS (MTD)</span>
+            <span className="font-data text-lg text-[#F5F6F7]">{totalOrdersCount}</span>
+            <span className="text-[9px] font-data text-[#626770] block mt-0.5">Canonical orders</span>
           </div>
-          <div className="industrial-panel-inset p-3">
-            <span className="text-[9px] font-display text-[#A2A6AD] block">REVENUE MTD</span>
-            <span className="font-data text-xl font-bold text-[#D6A84B]">
-              £{metrics.revenueMtd.toLocaleString('en-GB', { minimumFractionDigits: 2 })}
-            </span>
+
+          <div className="bg-[#0D0E11] border border-white/10 rounded-lg p-3">
+            <span className="text-[9px] font-display text-[#626770] uppercase block mb-1">MONTHLY TARGET</span>
+            <span className="font-data text-xs text-[#D6A84B] font-bold block mt-1">NOT SET</span>
+            <span className="text-[9px] font-data text-[#626770] block mt-0.5">User config required</span>
+          </div>
+
+          <div className="bg-[#0D0E11] border border-white/10 rounded-lg p-3">
+            <span className="text-[9px] font-display text-[#626770] uppercase block mb-1">FORECAST</span>
+            <span className="font-data text-[10px] text-[#A2A6AD] block mt-1">INSUFFICIENT HISTORY</span>
+          </div>
+
+          <div className="bg-[#0D0E11] border border-white/10 rounded-lg p-3">
+            <span className="text-[9px] font-display text-[#626770] uppercase block mb-1">PRIOR PERIOD</span>
+            <span className="font-data text-[10px] text-[#A2A6AD] block mt-1">NO PRIOR PERIOD</span>
           </div>
         </div>
 
       </div>
 
-      {/* Financial Target Metrics Row */}
-      <div className="pt-4 border-t border-white/10 space-y-2 font-data text-xs">
-        <div className="flex justify-between items-center text-[#A2A6AD]">
-          <span>Monthly Target:</span>
-          <span className="text-[#F5F6F7] font-bold">£{metrics.monthlyTarget.toLocaleString()}</span>
-        </div>
-        <div className="flex justify-between items-center text-[#A2A6AD]">
-          <span>Forecast (End of Month):</span>
-          <span className="text-[#22C55E] font-bold">£{metrics.monthlyForecast.toLocaleString()}</span>
-        </div>
-        <div className="flex justify-between items-center text-[#A2A6AD]">
-          <span>Previous Period Comparison:</span>
-          <span className="text-[#22C55E] font-bold">+18.4% vs Prior</span>
-        </div>
+      {/* Footer Notice */}
+      <div className="border-t border-white/5 pt-3 text-[10px] font-data text-[#626770] flex justify-between items-center">
+        <span>FX FEED: NOT CONFIGURED</span>
+        <span>NO FABRICATED FIGURES</span>
       </div>
 
     </div>

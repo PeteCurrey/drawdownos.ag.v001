@@ -5,7 +5,17 @@ import Link from 'next/link';
 import {
   Cpu, ChevronRight, ShieldCheck, AlertTriangle, CheckCircle2, Sliders, Save
 } from 'lucide-react';
-import { DEFAULT_AUTOPILOT_POLICY } from '@/lib/merchandising/demo-merchandising-data';
+const DEFAULT_AUTOPILOT_POLICY = {
+  autoRepairDrift: true,
+  autoDeployApprovedWinner: false,
+  autoUpdateKeywords: true,
+  autoUpdateApprovedAssets: false,
+  autoSyncPrice: true,
+  autoEndPromotions: true,
+  maxConcurrentExperiments: 3,
+  maxPriceVariancePct: 10.0,
+  minTrafficForExperiment: 500,
+};
 
 export default function MerchandisingAutopilotSettings() {
   const [policy, setPolicy] = useState(DEFAULT_AUTOPILOT_POLICY);

@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { DollarSign, ChevronRight, Filter, Search, Calendar, Clock, CheckCircle2, AlertTriangle } from 'lucide-react';
-import { DEMO_PAYOUTS } from '@/lib/finance/demo-finance-data';
 
 function stateColor(state: string): string {
   const map: Record<string, string> = {
@@ -27,10 +26,7 @@ function StatePill({ state }: { state: string }) {
 export default function PayoutsPage() {
   const [selectedState, setSelectedState] = useState('ALL');
 
-  const filteredPayouts = DEMO_PAYOUTS.filter(p => {
-    if (selectedState === 'ALL') return true;
-    return p.state === selectedState;
-  });
+  const filteredPayouts: any[] = [];
 
   return (
     <div className="min-h-screen bg-[#0A0B0D] text-[#F5F6F7] p-6">
@@ -59,7 +55,7 @@ export default function PayoutsPage() {
         {/* Header Stats & Aging Buckets */}
         <div className="grid grid-cols-4 gap-3 font-data text-xs">
           {[
-            { label: '0–30 DAYS DUE', value: `£${DEMO_PAYOUTS.filter(p => p.state === 'EXPECTED').reduce((s, p) => s + p.netExpectedGbp, 0).toLocaleString()}`, color: '#D6A84B' },
+            { label: '0–30 DAYS DUE', value: `£0.00`, color: '#D6A84B' },
             { label: '31–60 DAYS DUE', value: '£0.00', color: '#22C55E' },
             { label: '61–90 DAYS DUE', value: '£0.00', color: '#22C55E' },
             { label: '90+ DAYS OVERDUE', value: '£0.00', color: '#22C55E' },
@@ -77,41 +73,51 @@ export default function PayoutsPage() {
             EXPECTED & SETTLED MARKETPLACE PAYOUTS
           </div>
           <div className="divide-y divide-white/5">
-            {filteredPayouts.map(p => (
-              <div key={p.id} className="py-3.5 flex items-center justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-3">
-                    <span className="font-display text-sm font-bold text-[#F5F6F7]">{p.marketplaceName}</span>
-                    <StatePill state={p.state} />
-                  </div>
-                  <div className="text-[10px] text-[#626770]">Period: {p.periodLabel} · Currency: {p.payoutCurrency}</div>
-                </div>
-
-                <div className="flex items-center gap-6 text-[10px]">
-                  <div>
-                    <span className="text-[#626770]">Gross Local: </span>
-                    <strong className="text-[#F5F6F7]">{p.payoutCurrency} {p.grossSalesLocal.toLocaleString()}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[#626770]">Net Expected: </span>
-                    <strong className="text-[#D6A84B]">£{p.netExpectedGbp.toLocaleString()}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[#626770]">Net Paid: </span>
-                    <strong className="text-[#22C55E]">£{p.netPaidGbp.toLocaleString()}</strong>
-                  </div>
-                  {p.varianceGbp !== 0 && (
-                    <div>
-                      <span className="text-[#626770]">Variance: </span>
-                      <strong className="text-[#EF4444]">£{p.varianceGbp}</strong>
-                    </div>
-                  )}
-                  <Link href="/finance/reconciliation" className="bg-[#1C1F24] hover:bg-white/10 text-[#D6A84B] font-display text-[9px] font-bold px-3 py-1.5 rounded border border-[#D6A84B]/30">
-                    RECONCILE
-                  </Link>
+            {filteredPayouts.length === 0 ? (
+              <div className="bg-[#121418] border border-white/5 rounded-lg p-8 my-4 flex flex-col items-center justify-center text-center space-y-3 industrial-panel">
+                <AlertTriangle className="w-8 h-8 text-[#D6A84B]" />
+                <div className="font-display text-sm font-bold text-[#F5F6F7]">NO REAL PAYOUT DATA AVAILABLE</div>
+                <div className="text-[10px] text-[#626770] max-w-md">
+                  Cannot display payouts. Connect a supported marketplace integration (e.g., Stripe, Shopify) or upload settlement reports to view true receivables.
                 </div>
               </div>
-            ))}
+            ) : (
+              filteredPayouts.map(p => (
+                <div key={p.id} className="py-3.5 flex items-center justify-between">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-3">
+                      <span className="font-display text-sm font-bold text-[#F5F6F7]">{p.marketplaceName}</span>
+                      <StatePill state={p.state} />
+                    </div>
+                    <div className="text-[10px] text-[#626770]">Period: {p.periodLabel} · Currency: {p.payoutCurrency}</div>
+                  </div>
+
+                  <div className="flex items-center gap-6 text-[10px]">
+                    <div>
+                      <span className="text-[#626770]">Gross Local: </span>
+                      <strong className="text-[#F5F6F7]">{p.payoutCurrency} {p.grossSalesLocal.toLocaleString()}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[#626770]">Net Expected: </span>
+                      <strong className="text-[#D6A84B]">£{p.netExpectedGbp.toLocaleString()}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[#626770]">Net Paid: </span>
+                      <strong className="text-[#22C55E]">£{p.netPaidGbp.toLocaleString()}</strong>
+                    </div>
+                    {p.varianceGbp !== 0 && (
+                      <div>
+                        <span className="text-[#626770]">Variance: </span>
+                        <strong className="text-[#EF4444]">£{p.varianceGbp}</strong>
+                      </div>
+                    )}
+                    <Link href="/finance/reconciliation" className="bg-[#1C1F24] hover:bg-white/10 text-[#D6A84B] font-display text-[9px] font-bold px-3 py-1.5 rounded border border-[#D6A84B]/30">
+                      RECONCILE
+                    </Link>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 

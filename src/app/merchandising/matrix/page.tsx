@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   Sliders, ChevronRight, Globe, CheckCircle2, AlertTriangle, ExternalLink
 } from 'lucide-react';
-import { DEMO_LISTINGS, MERCHANDISING_STRATEGIES, LISTING_PRICES } from '@/lib/merchandising/demo-merchandising-data';
 
 export default function MerchandisingMatrix() {
   return (
@@ -33,50 +32,20 @@ export default function MerchandisingMatrix() {
         </div>
 
         {/* Side-by-side positioning grid */}
-        <div className="bg-[#0E1014] border border-white/8 rounded-xl overflow-x-auto p-4 space-y-4">
+        <div className="industrial-panel bg-[#0E1014] border border-white/8 rounded-xl overflow-x-auto p-4 space-y-4">
           <div className="font-display text-xs tracking-wider text-[#626770] pb-2 border-b border-white/8">
             TEST PRODUCT: HOW TO TRADE (DD-HTT-001) — CHANNEL POSITIONING COMPARISON
           </div>
 
-          <div className="grid grid-cols-5 gap-4 min-w-[1200px] font-data text-xs">
-            {DEMO_LISTINGS.map(lst => {
-              const strat = MERCHANDISING_STRATEGIES[lst.merchandisingStrategyId || 'strat-htt-amz'];
-              const price = LISTING_PRICES[lst.currentPriceId || 'pr-htt-amz'];
-              return (
-                <div key={lst.id} className="bg-[#121418] border border-white/8 rounded-xl p-4 space-y-3 flex flex-col justify-between">
-                  <div className="space-y-3">
-                    <div className="border-b border-white/5 pb-2">
-                      <div className="font-display text-sm font-bold text-[#F5F6F7]">{lst.marketplaceName}</div>
-                      <div className="text-[9px] text-[#D6A84B]">{lst.externalListingId}</div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <div className="text-[8px] text-[#626770] tracking-wider">PRIMARY AUDIENCE</div>
-                      <div className="text-[10px] text-[#A2A6AD] bg-[#0A0B0D] p-2 rounded border border-white/5">{strat?.primaryAudience || 'Self-directed trader'}</div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <div className="text-[8px] text-[#626770] tracking-wider">VALUE PROPOSITION</div>
-                      <div className="text-[10px] text-[#22C55E] bg-[#0A0B0D] p-2 rounded border border-white/5 font-bold">{strat?.primaryValueProp || 'Structured education'}</div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <div className="text-[8px] text-[#626770] tracking-wider">PRIMARY CTA</div>
-                      <div className="text-[10px] text-[#F5F6F7] italic">&ldquo;{strat?.primaryCta || 'Order now'}&rdquo;</div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <div className="text-[8px] text-[#626770] tracking-wider">PRICE & MARGIN</div>
-                      <div className="text-xs font-bold text-[#F5F6F7]">£{price?.marketplacePriceGbp || '19.99'} <span className="text-[#22C55E] text-[10px]">({price?.netMarginPct || 70}% margin)</span></div>
-                    </div>
-                  </div>
-
-                  <Link href={`/merchandising/listings/${lst.id}`} className="block text-center font-display text-[9px] text-[#D6A84B] hover:text-[#e2b558] border border-[#D6A84B]/20 rounded py-1.5 transition-colors">
-                    MANAGE CHANNEL
-                  </Link>
-                </div>
-              );
-            })}
+          <div className="p-16 flex flex-col items-center justify-center text-center space-y-4">
+            <AlertTriangle className="w-10 h-10 text-[#D6A84B]" />
+            <div className="font-display text-sm tracking-wider text-[#F5F6F7]">POSITIONING DATA UNAVAILABLE</div>
+            <div className="font-data text-xs text-[#626770] max-w-lg">
+              Drawdown OS cannot prove the positioning or matrix data. A verified strategy dataset or active channel configuration is required to populate this view.
+            </div>
+            <div className="font-display text-[10px] text-[#D6A84B] px-4 py-2 border border-[#D6A84B]/30 bg-[#D6A84B]/10 rounded-lg">
+              LINK STRATEGY DATABASE
+            </div>
           </div>
         </div>
 

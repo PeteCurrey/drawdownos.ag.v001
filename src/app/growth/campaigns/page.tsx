@@ -6,7 +6,6 @@ import {
   Target, ChevronRight, Filter, Search, Plus, DollarSign, Users,
   CheckCircle2, AlertTriangle, ShieldCheck, Clock, Zap
 } from 'lucide-react';
-import { GROWTH_CAMPAIGNS } from '@/lib/growth/demo-growth-data';
 
 function campaignStatusColor(status: string): string {
   const map: Record<string, string> = {
@@ -34,10 +33,7 @@ export default function CampaignFactoryPage() {
     'ALL', 'NET_REVENUE', 'FREE_TO_PAID_CONVERSION', 'LOCAL_EDITION_LAUNCH', 'AFFILIATE_RECRUITMENT'
   ];
 
-  const filteredCampaigns = GROWTH_CAMPAIGNS.filter(c => {
-    if (selectedObjective === 'ALL') return true;
-    return c.objective === selectedObjective;
-  });
+  const filteredCampaigns: any[] = [];
 
   return (
     <div className="min-h-screen bg-[#0A0B0D] text-[#F5F6F7] p-6">
@@ -66,10 +62,10 @@ export default function CampaignFactoryPage() {
         {/* Header Stats */}
         <div className="grid grid-cols-4 gap-3 font-data text-xs">
           {[
-            { label: 'TOTAL CAMPAIGNS', value: GROWTH_CAMPAIGNS.length, color: '#D6A84B' },
-            { label: 'RUNNING CAMPAIGNS', value: GROWTH_CAMPAIGNS.filter(c => c.status === 'RUNNING').length, color: '#22C55E' },
-            { label: 'TOTAL ATTRIBUTED NET', value: `£${GROWTH_CAMPAIGNS.reduce((sum, c) => sum + c.netContributionGbp, 0).toLocaleString()}`, color: '#22C55E' },
-            { label: 'AVG CONTRIBUTION ROAS', value: `${(GROWTH_CAMPAIGNS.reduce((sum, c) => sum + c.contributionRoas, 0) / GROWTH_CAMPAIGNS.length).toFixed(2)}x`, color: '#38BDF8' },
+            { label: 'TOTAL CAMPAIGNS', value: 0, color: '#D6A84B' },
+            { label: 'RUNNING CAMPAIGNS', value: 0, color: '#22C55E' },
+            { label: 'TOTAL ATTRIBUTED NET', value: `£0.00`, color: '#22C55E' },
+            { label: 'AVG CONTRIBUTION ROAS', value: `0.00x`, color: '#38BDF8' },
           ].map(s => (
             <div key={s.label} className="bg-[#0E1014] border border-white/8 rounded-xl p-3 space-y-1">
               <div className="text-[9px] text-[#626770] tracking-wider">{s.label}</div>
@@ -102,43 +98,13 @@ export default function CampaignFactoryPage() {
             ACTIVE & PREPARED GROWTH CAMPAIGNS
           </div>
           <div className="space-y-4">
-            {filteredCampaigns.map(c => (
-              <div key={c.id} className="bg-[#121418] border border-white/5 rounded-lg p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-3">
-                      <span className="font-display text-sm font-bold text-[#F5F6F7]">{c.name}</span>
-                      <StatusPill status={c.status} />
-                    </div>
-                    <div className="text-[10px] text-[#626770]">Type: {c.campaignType} · Objective: <strong className="text-[#D6A84B]">{c.objective}</strong></div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-bold text-[#22C55E]">£{c.netContributionGbp.toLocaleString()} Net Contribution</div>
-                    <div className="text-[9px] text-[#626770]">ROAS: <strong className="text-[#38BDF8]">{c.contributionRoas}x</strong></div>
-                  </div>
-                </div>
-
-                {/* Campaign BOM & Readiness */}
-                <div className="grid grid-cols-4 gap-3 bg-[#0E1014] p-3 rounded border border-white/5 text-[10px]">
-                  <div>
-                    <span className="text-[#626770]">Spend / Budget: </span>
-                    <strong className="text-[#F5F6F7]">£{c.actualCostGbp} / £{c.budgetGbp}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[#626770]">New Customers: </span>
-                    <strong className="text-[#22C55E]">{c.newCustomersCount}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[#626770]">Stop-Loss Spend: </span>
-                    <strong className="text-[#EF4444]">Max £{c.stopLossMaxSpendGbp || 'N/A'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[#626770]">BOM Readiness: </span>
-                    <strong className="text-[#22C55E]">{c.readinessScore}%</strong>
-                  </div>
-                </div>
+            <div className="bg-[#121418] border border-white/5 rounded-lg p-8 flex flex-col items-center justify-center text-center space-y-3 industrial-panel">
+              <Target className="w-8 h-8 text-[#D6A84B]" />
+              <div className="font-display text-sm font-bold text-[#F5F6F7]">NO REAL CAMPAIGN DATA AVAILABLE</div>
+              <div className="text-[10px] text-[#626770] max-w-md">
+                Cannot display active campaigns. Requires active connection to advertising accounts (Google/Meta Ads) and attribution tracking to sync real ROAS and spend metrics.
               </div>
-            ))}
+            </div>
           </div>
         </div>
 

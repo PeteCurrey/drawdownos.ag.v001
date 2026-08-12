@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import ExecutiveShell from '@/components/executive/ExecutiveShell';
-import { DEMO_OBJECTIVES } from '@/lib/executive/demo-executive-data';
+
 import Link from 'next/link';
 
 export default function ObjectivesPage() {
@@ -100,68 +100,11 @@ export default function ObjectivesPage() {
         {/* ACTIVE OBJECTIVES */}
         <div className="space-y-4">
           <h2 className="text-sm font-display text-white/50 pl-1">ACTIVE OBJECTIVES</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {DEMO_OBJECTIVES.map((obj) => {
-              const formatCurrency = (val: number) => `£${val.toLocaleString()}`;
-              const progressPct = (obj.currentValue / obj.targetValue) * 100;
-              const isAtRisk = obj.status === 'AT_RISK';
-              const isGreen = obj.status === 'ON_TRACK';
-              const badgeColor = isGreen ? 'bg-[#22C55E]/20 text-[#22C55E]' : isAtRisk ? 'bg-[#EF4444]/20 text-[#EF4444]' : 'bg-[#D6A84B]/20 text-[#D6A84B]';
-
-              return (
-                <div key={obj.id} className="industrial-panel p-5 space-y-5 flex flex-col justify-between">
-                  <div>
-                    <div className="flex justify-between items-start mb-3">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-display ${badgeColor}`}>
-                        {obj.status.replace('_', ' ')}
-                      </span>
-                      <span className="text-xs font-data text-white/40">{obj.daysRemaining} days left</span>
-                    </div>
-                    <h3 className="text-lg text-white font-medium leading-tight mb-4">{obj.naturalLanguage}</h3>
-                    
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-xs font-data">
-                        <span className="text-white/50">Progress</span>
-                        <span className="text-white">{formatCurrency(obj.currentValue)} / {formatCurrency(obj.targetValue)} ({progressPct.toFixed(1)}%)</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                        <div className={`h-full ${isGreen ? 'bg-[#22C55E]' : isAtRisk ? 'bg-[#EF4444]' : 'bg-[#D6A84B]'}`} style={{ width: `${progressPct}%` }} />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 border-t border-white/10 pt-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <div className="text-[10px] font-display text-white/40">PROBABILITY</div>
-                        <div className={`text-xl font-data mt-0.5 ${obj.successProbabilityPct > 70 ? 'text-[#22C55E]' : 'text-[#D6A84B]'}`}>
-                          {obj.successProbabilityPct}%
-                        </div>
-                        <div className="text-xs text-white/50 mt-1 line-clamp-1" title={obj.whyProbability}>{obj.whyProbability}</div>
-                      </div>
-                      <div>
-                        <div className="text-[10px] font-display text-white/40">STRATEGY</div>
-                        <div className="text-sm text-white mt-1">{obj.strategyElements.length} active initiatives</div>
-                      </div>
-                    </div>
-                    
-                    {obj.parsed.constraints.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {obj.parsed.constraints.map((c: any, i: number) => (
-                          <div key={i} className={`px-2 py-1 rounded text-[10px] font-data border ${c.isViolated ? 'bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444]' : 'bg-white/5 border-white/10 text-white/50'}`}>
-                            {c.metric} {c.operator} {c.value}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    <Link href={`/executive/objectives/${obj.id}`} className="block w-full text-center py-2 bg-white/5 hover:bg-white/10 rounded text-xs font-display text-white transition-colors">
-                      OPEN COCKPIT →
-                    </Link>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="grid grid-cols-1 gap-4">
+            <div className="industrial-panel p-6 text-center border-dashed border-2 border-white/10 mt-6">
+              <h3 className="text-[#D6A84B] font-display text-sm font-bold mb-2">NO DATA CONNECTED</h3>
+              <p className="text-[#A2A6AD] text-sm">This module requires an active database connection or platform integration to display real data. Fake data is prohibited.</p>
+            </div>
           </div>
         </div>
       </div>

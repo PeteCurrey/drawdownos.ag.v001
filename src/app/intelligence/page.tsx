@@ -3,12 +3,18 @@
 import React from 'react';
 import Link from 'next/link';
 import { Brain, Radio, TrendingUp, AlertTriangle, ExternalLink, RefreshCw, CheckCircle2, Target, Globe, Zap, ArrowUpRight, ChevronRight } from 'lucide-react';
-import { DEMO_MARKETPLACE_CANDIDATES } from '@/lib/demo-data';
-import { PORTFOLIO_SURFACE_SUMMARY } from '@/lib/surface-area-data';
+
 
 export default function IntelligencePage() {
-  const candidates = DEMO_MARKETPLACE_CANDIDATES;
-  const S = PORTFOLIO_SURFACE_SUMMARY;
+  const candidates: any[] = [];
+  const S: any = {
+    portfolioCapturedPercent: 0,
+    portfolioSurfaceScore: 0,
+    totalLiveChannelPositions: 0,
+    totalEligibleUnexplored: 0,
+    portfolioMonthlyRevenueLive: 0,
+    portfolioMonthlyRevenuePotential: 0
+  };
 
   const modules = [
     {
@@ -151,51 +157,13 @@ export default function IntelligencePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {candidates.map(cand => (
-            <div key={cand.id} className="industrial-panel p-5 space-y-4 flex flex-col justify-between hover:border-[#D6A84B]/40 transition-all">
-              <div>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-display text-base font-bold text-[#F5F6F7]">{cand.name}</h3>
-                    <span className="text-[10px] font-data text-[#626770]">{cand.country} • {cand.regionsServed.join(', ')}</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-data text-xl font-bold text-[#D6A84B]">{cand.opportunityScore}</span>
-                    <span className="text-[9px] font-display text-[#626770] block">SCORE</span>
-                  </div>
-                </div>
-
-                <div className="mt-4 space-y-2 font-data text-xs text-[#A2A6AD]">
-                  <div className="flex justify-between p-2 bg-[#0D0E11] rounded">
-                    <span>Est. Monthly Value:</span>
-                    <span className="text-[#22C55E] font-bold">{cand.monthlyEstValue}</span>
-                  </div>
-                  <div className="flex justify-between p-2 bg-[#0D0E11] rounded">
-                    <span>Integration Effort:</span>
-                    <span className="text-[#F5F6F7]">{cand.integrationEffort}</span>
-                  </div>
-                  <div className="flex justify-between p-2 bg-[#0D0E11] rounded">
-                    <span>Compliance Rating:</span>
-                    <span className="text-[#22C55E] font-bold">{cand.complianceCompatibility}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-3 border-t border-white/10 flex items-center justify-between">
-                <span className="text-[10px] font-display px-2 py-0.5 rounded bg-[#D6A84B]/10 text-[#D6A84B] border border-[#D6A84B]/30">
-                  {cand.status}
-                </span>
-                <a
-                  href={cand.officialUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-xs font-data text-[#38BDF8] hover:underline flex items-center gap-1"
-                >
-                  Inspect <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
+          <div className="col-span-full industrial-panel p-8 flex flex-col items-center justify-center text-center space-y-3">
+            <AlertTriangle className="w-8 h-8 text-[#D6A84B]" />
+            <div className="font-display text-sm font-bold text-[#F5F6F7]">NO REAL MARKETPLACE CANDIDATES AVAILABLE</div>
+            <div className="text-[10px] text-[#626770] max-w-md">
+              Cannot display discovery pipeline. Requires active connection to external marketplace discovery agent.
             </div>
-          ))}
+          </div>
         </div>
       </div>
 

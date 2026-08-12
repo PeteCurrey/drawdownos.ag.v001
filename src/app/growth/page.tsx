@@ -7,10 +7,6 @@ import {
   ChevronRight, ArrowRight, AlertTriangle, CheckCircle2, Clock, Sparkles,
   Layers, Search, Sliders, Play, RefreshCw, Eye, ArrowUpRight
 } from 'lucide-react';
-import {
-  GROWTH_CHANNELS, GROWTH_CAMPAIGNS, DEMO_AFFILIATES, DEMO_LEAD_MAGNETS,
-  DEMO_SEO_OPPORTUNITIES, DEMO_EFFECTIVE_SURFACE
-} from '@/lib/growth/demo-growth-data';
 import { identifyDemandGaps } from '@/lib/growth/demand-gap-engine';
 import { growProduct, growTheMachine } from '@/lib/growth/flagship-actions';
 
@@ -26,14 +22,16 @@ export default function GrowthCommandControlRoom() {
   const [metricView, setMetricView] = useState<'NET_REVENUE' | 'ORDERS' | 'TRAFFIC'>('NET_REVENUE');
   const [showMachineDrawer, setShowMachineDrawer] = useState(false);
 
-  const demandGaps = identifyDemandGaps();
-  const growthPlan = growProduct('DD-HTT-001');
-  const machinePlan = growTheMachine();
+  const demandGaps: any[] = [];
+  const growthPlan: any = { easyWins: [], affiliateExpansion: [], seoOpportunities: [], localisationLaunches: [] };
+  const machinePlan: any = { easyWins: [], affiliateExpansion: [], seoOpportunities: [], localisationLaunches: [] };
 
-  const totalAttributedNetContribution = GROWTH_CAMPAIGNS.reduce((sum, c) => sum + c.netContributionGbp, 0);
-  const totalNewCustomers = GROWTH_CAMPAIGNS.reduce((sum, c) => sum + c.newCustomersCount, 0);
-  const runningCampaigns = GROWTH_CAMPAIGNS.filter(c => c.status === 'RUNNING').length;
-  const activeAffiliates = DEMO_AFFILIATES.filter(a => a.pipelineStage === 'ACTIVE').length;
+  const totalAttributedNetContribution = 0;
+  const totalNewCustomers = 0;
+  const runningCampaigns = 0;
+  const activeAffiliates = 0;
+  
+  const DEMO_EFFECTIVE_SURFACE = { rawRsaPct: 0, growthActivatedRsaPct: 0, revenueGeneratingRsaPct: 0 };
 
   return (
     <div className="min-h-screen bg-[#0A0B0D] text-[#F5F6F7] p-6">
@@ -146,18 +144,28 @@ export default function GrowthCommandControlRoom() {
               <span className="text-[10px] text-[#626770]">{demandGaps.length} gaps identified</span>
             </div>
             <div className="space-y-3">
-              {demandGaps.map(gap => (
-                <div key={gap.id} className="bg-[#121418] border border-white/5 rounded-lg p-4 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="font-display text-sm font-bold text-[#F5F6F7]">{gap.productName}</div>
-                    <span className="font-bold text-[#D6A84B]">{gap.marketplaceName}</span>
-                  </div>
-                  <div className="text-[10px] text-[#626770]">{gap.identifiedGapReason}</div>
-                  <div className="bg-[#D6A84B]/10 border border-[#D6A84B]/20 p-2 rounded text-[10px] text-[#D6A84B]">
-                    <strong>RECOMMENDED ACTION:</strong> {gap.recommendedAction}
+              {demandGaps.length === 0 ? (
+                <div className="bg-[#121418] border border-white/5 rounded-lg p-8 flex flex-col items-center justify-center text-center space-y-3 industrial-panel">
+                  <AlertTriangle className="w-8 h-8 text-[#D6A84B]" />
+                  <div className="font-display text-sm font-bold text-[#F5F6F7]">NO REAL DEMAND GAPS AVAILABLE</div>
+                  <div className="text-[10px] text-[#626770] max-w-md">
+                    Cannot calculate demand gaps. Requires active connection to advertising accounts (Google/Meta Ads) and marketplace traffic reports to find live listings without traffic.
                   </div>
                 </div>
-              ))}
+              ) : (
+                demandGaps.map(gap => (
+                  <div key={gap.id} className="bg-[#121418] border border-white/5 rounded-lg p-4 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="font-display text-sm font-bold text-[#F5F6F7]">{gap.productName}</div>
+                      <span className="font-bold text-[#D6A84B]">{gap.marketplaceName}</span>
+                    </div>
+                    <div className="text-[10px] text-[#626770]">{gap.identifiedGapReason}</div>
+                    <div className="bg-[#D6A84B]/10 border border-[#D6A84B]/20 p-2 rounded text-[10px] text-[#D6A84B]">
+                      <strong>RECOMMENDED ACTION:</strong> {gap.recommendedAction}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -203,19 +211,19 @@ export default function GrowthCommandControlRoom() {
             <div className="grid grid-cols-3 gap-4">
               <div className="bg-[#121418] p-3 rounded border border-white/5 space-y-2">
                 <div className="font-bold text-[#22C55E]">EASY WINS</div>
-                {machinePlan.easyWins.map((item, i) => (
+                {machinePlan.easyWins.map((item: string, i: number) => (
                   <div key={i} className="text-[10px] text-[#A2A6AD]">• {item}</div>
                 ))}
               </div>
               <div className="bg-[#121418] p-3 rounded border border-white/5 space-y-2">
                 <div className="font-bold text-[#818CF8]">AFFILIATE EXPANSION</div>
-                {machinePlan.affiliateExpansion.map((item, i) => (
+                {machinePlan.affiliateExpansion.map((item: string, i: number) => (
                   <div key={i} className="text-[10px] text-[#A2A6AD]">• {item}</div>
                 ))}
               </div>
               <div className="bg-[#121418] p-3 rounded border border-white/5 space-y-2">
                 <div className="font-bold text-[#38BDF8]">SEO & LOCALISATION</div>
-                {machinePlan.seoOpportunities.concat(machinePlan.localisationLaunches).map((item, i) => (
+                {machinePlan.seoOpportunities.concat(machinePlan.localisationLaunches).map((item: string, i: number) => (
                   <div key={i} className="text-[10px] text-[#A2A6AD]">• {item}</div>
                 ))}
               </div>

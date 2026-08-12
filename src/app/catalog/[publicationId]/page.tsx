@@ -24,7 +24,7 @@ import {
   RefreshCw,
   Sparkles
 } from 'lucide-react';
-import { SEED_PUBLICATION } from '@/lib/demo-data';
+import { AlertTriangle } from 'lucide-react';
 
 type DetailTab = 
   | 'OVERVIEW'
@@ -49,7 +49,18 @@ export default function PublicationDetailPage() {
   const [activeTab, setActiveTab] = useState<DetailTab>('OVERVIEW');
   const [copiedListing, setCopiedListing] = useState(false);
 
-  const pub = SEED_PUBLICATION;
+  const pub: any = {
+    canonicalId: pubId,
+    version: '?',
+    status: 'UNKNOWN',
+    title: 'NO REAL DATA AVAILABLE',
+    subtitle: 'Requires active connection to a real inventory system.',
+    formatCount: 0,
+    languageCount: 0,
+    liveMarketplaces: 0,
+    lifetimeUnits: 0,
+    lifetimeRevenue: 0,
+  };
 
   const tabs: { id: DetailTab; label: string }[] = [
     { id: 'OVERVIEW', label: 'OVERVIEW' },
@@ -163,7 +174,7 @@ export default function PublicationDetailPage() {
                 COMMERCIAL SNAPSHOT
               </h3>
               <p className="text-xs text-[#A2A6AD] leading-relaxed">
-                {pub.title} ({pub.canonicalId}) is Drawdown's flagship institutional trading playbook. It features 148 pages of risk management protocols, order flow mechanics, and drawdown reduction strategies.
+                Connect to a true CMS or database to view real product data for {pub.canonicalId}.
               </p>
               
               <div className="grid grid-cols-2 gap-3 pt-2 font-data text-xs">
@@ -183,12 +194,7 @@ export default function PublicationDetailPage() {
                 ACTIVE DISTRIBUTION CHANNELS
               </h3>
               <div className="space-y-2 font-data text-xs">
-                {['Amazon Kindle UK', 'Whop Direct', 'Gumroad Storefront', 'Etsy Shop', 'PublishDrive Kobo'].map((store, i) => (
-                  <div key={i} className="flex items-center justify-between p-2.5 bg-[#0D0E11] rounded border border-white/5">
-                    <span className="text-[#F5F6F7] font-bold">{store}</span>
-                    <span className="text-[#22C55E] text-[10px] font-display">LIVE & SYNCED</span>
-                  </div>
-                ))}
+                <div className="p-4 text-center text-[#626770]">No active channels found.</div>
               </div>
             </div>
           </div>
@@ -265,7 +271,7 @@ export default function PublicationDetailPage() {
                 <label className="text-[10px] font-display text-[#FF6A18]">REQUIRED RISK DISCLOSURE STATEMENT</label>
                 <textarea 
                   rows={4}
-                  defaultValue="DISCLAIMER: Trading foreign exchange, futures, and digital assets carries high financial risk and is not suitable for all investors. Past performance is no guarantee of future results. Drawdown Publishing provides educational content only."
+                  defaultValue=""
                   className="w-full bg-[#0D0E11] border border-[#FF6A18]/30 rounded-lg p-2.5 text-[#F5F6F7] focus:outline-none focus:border-[#FF6A18]"
                 />
               </div>
@@ -273,7 +279,7 @@ export default function PublicationDetailPage() {
               <div className="p-4 bg-[#0D0E11] rounded-lg border border-white/10 space-y-2">
                 <span className="text-[10px] font-display text-[#22C55E]">SEO SEARCH KEYWORDS</span>
                 <p className="text-[#A2A6AD] text-[11px]">
-                  trading playbook, drawdown management, prop firm guide, price action forex, position sizing risk calculator
+                  No keywords generated.
                 </p>
               </div>
             </div>
@@ -292,27 +298,13 @@ export default function PublicationDetailPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-data text-xs">
-            {[
-              { format: 'Premium PDF', sku: 'DD-HTT-001-PDF-V1', status: 'APPROVED', date: '2026-08-10' },
-              { format: 'Reflowable EPUB 3', sku: 'DD-HTT-001-EPUB-V1', status: 'NEEDS_QA', date: '2026-08-11' },
-              { format: 'Kindle KPF Package', sku: 'DD-HTT-001-KPF-V1', status: 'APPROVED', date: '2026-08-10' },
-              { format: 'Print-on-Demand PDF', sku: 'DD-HTT-001-POD-V1', status: 'AUTO_GENERATED', date: '2026-08-12' },
-              { format: 'Audio Product Pack', sku: 'DD-HTT-001-AUD-V1', status: 'NEEDS_QA', date: '2026-08-12' },
-              { format: 'Worksheet Templates', sku: 'DD-HTT-001-WRK-V1', status: 'APPROVED', date: '2026-08-09' },
-            ].map((f, i) => (
-              <div key={i} className="industrial-panel-inset p-4 space-y-2 border-l-2 border-l-[#D6A84B]">
-                <div className="flex justify-between items-start">
-                  <span className="font-bold text-[#F5F6F7]">{f.format}</span>
-                  <span className={`text-[9px] font-display px-2 py-0.5 rounded ${
-                    f.status === 'APPROVED' ? 'bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/30' : 'bg-[#D6A84B]/10 text-[#D6A84B] border border-[#D6A84B]/30'
-                  }`}>
-                    {f.status}
-                  </span>
-                </div>
-                <div className="text-[10px] text-[#626770]">{f.sku}</div>
-                <div className="text-[10px] text-[#A2A6AD]">Generated: {f.date}</div>
+            <div className="col-span-full industrial-panel p-8 flex flex-col items-center justify-center text-center space-y-3">
+              <AlertTriangle className="w-8 h-8 text-[#D6A84B]" />
+              <div className="font-display text-sm font-bold text-[#F5F6F7]">NO REAL FORMAT DATA AVAILABLE</div>
+              <div className="text-[10px] text-[#626770] max-w-md">
+                Cannot display formats. Requires active connection to format pipeline and storage layer.
               </div>
-            ))}
+            </div>
           </div>
         </div>
       )}

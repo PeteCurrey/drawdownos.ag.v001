@@ -2,10 +2,9 @@
 
 import React from 'react';
 import { OptimiseShell } from '@/components/optimise/OptimiseShell';
-import { DEMO_EXPERIMENTS } from '@/lib/optimise/demo-optimise-data';
 
 export default function ExperimentQueuePage() {
-  const queued = DEMO_EXPERIMENTS.filter(e => e.state === 'READY' || e.state === 'APPROVAL_REQUIRED').sort((a, b) => b.priorityScore - a.priorityScore);
+  const queued: any[] = [];
 
   return (
     <OptimiseShell>
@@ -15,14 +14,24 @@ export default function ExperimentQueuePage() {
           <p className="text-gray-400 font-data">Ranked experiment candidate pipeline.</p>
         </div>
 
-        <div className="mb-6 flex justify-between items-center bg-[#D6A84B]/10 border border-[#D6A84B]/30 p-4 rounded-xl shadow-lg">
-          <span className="font-display text-[#D6A84B] text-sm tracking-wider">3 HIGH-PRIORITY EXPERIMENTS READY</span>
-          <button className="bg-[#D6A84B] text-black font-display font-bold text-xs px-5 py-2.5 rounded hover:bg-[#c49842] transition-colors">
-            APPROVE TOP 3 LOW-RISK EXPERIMENTS
-          </button>
-        </div>
+        {queued.length > 0 && (
+          <div className="mb-6 flex justify-between items-center bg-[#D6A84B]/10 border border-[#D6A84B]/30 p-4 rounded-xl shadow-lg">
+            <span className="font-display text-[#D6A84B] text-sm tracking-wider">{queued.length} HIGH-PRIORITY EXPERIMENTS READY</span>
+            <button className="bg-[#D6A84B] text-black font-display font-bold text-xs px-5 py-2.5 rounded hover:bg-[#c49842] transition-colors">
+              APPROVE TOP LOW-RISK EXPERIMENTS
+            </button>
+          </div>
+        )}
 
         <div className="space-y-4">
+          {queued.length === 0 && (
+            <div className="industrial-panel bg-[#0A0B0D] border border-white/10 rounded-xl p-12 flex flex-col items-center justify-center text-center">
+              <div className="text-[#38BDF8] font-display text-sm tracking-widest mb-4">QUEUE EMPTY</div>
+              <p className="text-white/60 text-sm font-data max-w-lg">
+                There are currently no generated or manual experiments in the queue. Use the Designer or Miner to add candidates.
+              </p>
+            </div>
+          )}
           {queued.map((exp, idx) => (
             <div key={exp.id} className="industrial-panel bg-gradient-to-br from-[#17191E] to-[#121418] border border-white/10 rounded-xl p-6 shadow-xl flex items-center justify-between">
               <div className="flex items-center space-x-6 w-1/2">

@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { OptimiseShell } from '@/components/optimise/OptimiseShell';
-import { DEMO_LEARNINGS } from '@/lib/optimise/demo-optimise-data';
 // import { Learning } from '@/lib/optimise/types';
 
 export default function LearningLibraryPage() {
@@ -18,27 +17,7 @@ export default function LearningLibraryPage() {
     'BUNDLES'
   ];
 
-  // Using DEMO_LEARNINGS if available or fallback
-  const learnings = DEMO_LEARNINGS || [
-    {
-      id: 'lrn-001',
-      title: 'Beginner trading PDFs show low price elasticity',
-      scope: 'CATEGORY',
-      confidence: 'STRONG',
-      implication: 'We can safely increase baseline prices for entry-level information products without sacrificing total customer acquisition volume.',
-      evidence: '3 experiments, 312 customers',
-      relevance: 'HIGH (validated 12 Aug 2026)',
-    },
-    {
-      id: 'lrn-002',
-      title: 'Guarantees on Etsy reduce trust',
-      scope: 'MARKETPLACE',
-      confidence: 'MODERATE',
-      implication: 'Avoid visual guarantee badges on Etsy; let the platform\'s native buyer protection do the heavy lifting.',
-      evidence: '1 experiment, 1,450 customers',
-      relevance: 'HIGH (validated 10 Aug 2026)',
-    }
-  ];
+  const learnings: any[] = [];
 
   return (
     <OptimiseShell title="LEARNING LIBRARY" subtitle="Institutional commercial memory.">
@@ -71,6 +50,14 @@ export default function LearningLibraryPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {learnings.length === 0 && (
+          <div className="col-span-full industrial-panel bg-[#0A0B0D] border border-white/10 rounded-xl p-12 flex flex-col items-center justify-center text-center">
+            <div className="text-[#38BDF8] font-display text-sm tracking-widest mb-4">NO LEARNINGS FOUND</div>
+            <p className="text-white/60 text-sm font-data max-w-lg">
+              Institutional commercial memory requires real historical experiments. Connect your experiment platform or database to sync validated learnings and establish your baseline.
+            </p>
+          </div>
+        )}
         {learnings.map(learning => (
           <div key={learning.id} className="bg-gradient-to-br from-[#17191E] to-[#121418] border border-white/8 rounded-xl p-6 flex flex-col">
             <div className="flex justify-between items-start mb-4">

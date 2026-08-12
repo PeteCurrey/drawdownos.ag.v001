@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { OptimiseShell } from '@/components/optimise/OptimiseShell';
-import { DEMO_OPTIMISATION_OPPORTUNITIES } from '@/lib/optimise/demo-optimise-data';
 // import { OptimisationOpportunity } from '@/lib/optimise/types';
 
 export default function OpportunitiesPage() {
@@ -16,20 +15,7 @@ export default function OpportunitiesPage() {
     'TERRITORY SIGNALS'
   ];
 
-  // Using provided DEMO_OPTIMISATION_OPPORTUNITIES if available or fallback
-  const opportunities = DEMO_OPTIMISATION_OPPORTUNITIES || [
-    {
-      id: 'opp-001',
-      title: 'Test higher price in UK',
-      priorityScore: 92,
-      knowledgeGap: 'What is the maximum price elasticity for the UK market?',
-      hypothesis: 'Increasing the UK price by 15% will reduce conversion by <5%, yielding higher net revenue.',
-      expectedValue: '£1,200 - £3,500',
-      learningValueScope: 'TERRITORY',
-      effort: 'LOW',
-      risk: 'LOW',
-    }
-  ];
+  const opportunities: any[] = [];
 
   return (
     <OptimiseShell title="OPPORTUNITY MINER" subtitle="Auto-generated experiment candidates from live OS data.">
@@ -52,6 +38,14 @@ export default function OpportunitiesPage() {
       </div>
 
       <div className="space-y-6">
+        {opportunities.length === 0 && (
+          <div className="industrial-panel bg-[#0A0B0D] border border-white/10 rounded-xl p-12 flex flex-col items-center justify-center text-center">
+            <div className="text-[#D6A84B] font-display text-sm tracking-widest mb-4">NO OPPORTUNITIES GENERATED</div>
+            <p className="text-white/60 text-sm font-data max-w-lg">
+              The Opportunity Miner requires live commerce data to identify structural testing gaps. Connect a data source to automatically generate experiment candidates.
+            </p>
+          </div>
+        )}
         {opportunities.map(opp => (
           <div key={opp.id} className="bg-gradient-to-br from-[#17191E] to-[#121418] border border-white/8 rounded-xl p-6">
             <div className="flex justify-between items-start mb-6">

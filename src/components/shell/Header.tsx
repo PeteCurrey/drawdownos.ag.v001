@@ -68,7 +68,7 @@ export default function Header() {
           
           {/* Left Wordmark Logo & Branding */}
           <div className="flex items-center gap-6 shrink-0">
-            <Link href="/command" className="flex items-center gap-3 group">
+            <Link href="/executive" className="flex items-center gap-3 group">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-b from-[#1C1F24] to-[#121418] border border-[#D6A84B]/40 flex items-center justify-center shadow-lg group-hover:border-[#D6A84B] transition-colors">
                 <span className="font-display text-sm text-[#D6A84B] font-bold">DD</span>
               </div>

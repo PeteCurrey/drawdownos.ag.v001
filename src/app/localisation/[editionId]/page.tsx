@@ -5,12 +5,8 @@ import Link from 'next/link';
 import {
   Languages, ChevronRight, BookOpen, Globe, ShieldCheck, FileText,
   DollarSign, Image, Layers, History, ClipboardCheck, AlertTriangle,
-  CheckCircle2, ExternalLink, RefreshCw, Eye, Edit3
+  CheckCircle2, ExternalLink, RefreshCw, Eye, Edit3, Database
 } from 'lucide-react';
-import {
-  LOCALISED_EDITIONS, DEMO_TRANSLATION_UNITS, TRANSLATION_MEMORY,
-  DRAWDOWN_TERM_BASE
-} from '@/lib/localisation/demo-localisation-data';
 
 function stateColor(state: string): string {
   const map: Record<string, string> = {
@@ -57,7 +53,24 @@ export default function LocalEditionDetailCommandCentre({
   const { editionId } = use(params);
   const [activeTab, setActiveTab] = useState<TabId>('overview');
 
-  const edition = LOCALISED_EDITIONS.find(e => e.id === editionId) || LOCALISED_EDITIONS[1]; // Default to German DACH
+  const edition = {
+    id: editionId,
+    titleLocalised: 'Edition Not Found',
+    localeName: 'Unknown',
+    localeCode: 'XX',
+    editionVersion: 'v0.0',
+    state: 'BLOCKED',
+    sourceEditionId: 'Unknown',
+    sourceVersion: 'v0.0',
+    completionPct: 0,
+    totalUnits: 0,
+    approvedUnits: 0,
+    complianceStatus: 'WARN',
+    blockingIssuesCount: 0,
+    translatorName: '',
+    reviewerName: '',
+    translationMethod: 'N/A'
+  };
 
   return (
     <div className="min-h-screen bg-[#0A0B0D] text-[#F5F6F7] p-6">
@@ -173,48 +186,25 @@ export default function LocalEditionDetailCommandCentre({
         {activeTab === 'translation' && (
           <div className="space-y-3 font-data text-xs">
             <div className="font-display text-xs tracking-wider text-[#626770]">TRANSLATION SEGMENTS PREVIEW</div>
-            {DEMO_TRANSLATION_UNITS.map(tu => (
-              <div key={tu.id} className="bg-[#0E1014] border border-white/8 rounded-xl p-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-[#D6A84B]">{tu.unitType} SEGMENT</span>
-                  <StatePill state={tu.status} />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-[#121418] p-3 rounded border border-white/5 space-y-1">
-                    <div className="text-[9px] text-[#626770]">ENGLISH SOURCE</div>
-                    <div className="text-[#F5F6F7]">{tu.sourceText}</div>
-                  </div>
-                  <div className="bg-[#121418] p-3 rounded border border-white/5 space-y-1">
-                    <div className="text-[9px] text-[#22C55E]">GERMAN TRANSLATION</div>
-                    <div className="text-[#F5F6F7]">{tu.translatedText || 'Un-translated'}</div>
-                  </div>
-                </div>
-                {tu.reviewerNotes && (
-                  <div className="text-[10px] text-[#EF4444] bg-[#EF4444]/10 p-2 rounded border border-[#EF4444]/20">
-                    {tu.reviewerNotes}
-                  </div>
-                )}
+            <div className="bg-[#0E1014] border border-white/8 rounded-xl p-8 text-center space-y-3 industrial-panel">
+              <Database className="w-6 h-6 text-[#626770] mx-auto" />
+              <div className="font-display text-sm text-[#F5F6F7]">NO TRANSLATION UNITS LOADED</div>
+              <div className="text-xs text-[#626770] max-w-md mx-auto">
+                Connect your CMS or Translation Management System to pull real source strings and translated segments.
               </div>
-            ))}
+            </div>
           </div>
         )}
 
         {activeTab === 'terminology' && (
           <div className="bg-[#0E1014] border border-white/8 rounded-xl overflow-hidden font-data text-xs">
             <div className="px-4 py-3 border-b border-white/8 font-display text-xs tracking-wider text-[#626770]">DRAWDOWN TERM BASE & LOCALE TRANSLATIONS</div>
-            <div className="divide-y divide-white/5">
-              {DRAWDOWN_TERM_BASE.map(tb => (
-                <div key={tb.id} className="p-4 flex items-center justify-between">
-                  <div>
-                    <div className="font-bold text-[#F5F6F7]">{tb.termEn}</div>
-                    <div className="text-[9px] text-[#626770]">{tb.category} · {tb.definition}</div>
-                  </div>
-                  <div className="flex items-center gap-4 text-[10px]">
-                    <span className="text-[#22C55E] font-bold">{tb.translations['de-DE']?.preferred || 'Drawdown OS'}</span>
-                    <StatePill state={tb.classification} />
-                  </div>
-                </div>
-              ))}
+            <div className="p-8 text-center space-y-3 industrial-panel">
+              <Database className="w-6 h-6 text-[#626770] mx-auto" />
+              <div className="font-display text-sm text-[#F5F6F7]">TERM BASE DISCONNECTED</div>
+              <div className="text-xs text-[#626770] max-w-md mx-auto">
+                No term base entries are available for this locale. Please configure the term base connector.
+              </div>
             </div>
           </div>
         )}

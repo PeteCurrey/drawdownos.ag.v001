@@ -3,8 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { Zap, Clock, AlertTriangle, ArrowUpRight, CheckCircle2, Server, Sliders, TrendingUp, DollarSign, Brain } from 'lucide-react';
-import DistributionFlowGraph from '@/components/command/DistributionFlowGraph';
-import RevenueGauge from '@/components/command/RevenueGauge';
 import TelemetryGrid from '@/components/command/TelemetryGrid';
 import LiveActivityStream from '@/components/command/LiveActivityStream';
 
@@ -236,19 +234,6 @@ export default function CommandPage() {
         >
           OPEN FINANCIAL COMMAND <ArrowUpRight className="w-3.5 h-3.5" />
         </Link>
-      </div>
-
-      {/* Main Dual Phoenix Control Modules Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* Left Main Module: Global Distribution Flow (7 Cols) */}
-        <div className="lg:col-span-8">
-          <DistributionFlowGraph />
-        </div>
-
-        {/* Right Main Module: Revenue Engine Gauge (4 Cols) */}
-        <div className="lg:col-span-4">
-          <RevenueGauge />
-        </div>
       </div>
 
       {/* Bottom Row: Live Telemetry Stream */}

@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { OptimiseShell } from '@/components/optimise/OptimiseShell';
-import { DEMO_EXPERIMENTS } from '@/lib/optimise/demo-optimise-data';
 
 export default function ExperimentDesignerPage() {
   const [mode, setMode] = useState<'AI' | 'MANUAL'>('AI');

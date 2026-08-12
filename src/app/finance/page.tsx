@@ -7,9 +7,6 @@ import {
   AlertTriangle, CheckCircle2, Clock, Sparkles, Layers, Sliders,
   RefreshCw, Eye, ArrowUpRight, BarChart3, PieChart
 } from 'lucide-react';
-import {
-  DEMO_WATERFALL, DEMO_PAYOUTS, DEMO_TRANSACTIONS, DEMO_ECONOMIC_RSA
-} from '@/lib/finance/demo-finance-data';
 import { calculateEconomicWaterfall, calculateContributionLayers } from '@/lib/finance/waterfall-engine';
 import { followTheMoney, getMostProfitableSurfaces, getLossMakingSurfaces } from '@/lib/finance/flagship-actions';
 
@@ -17,16 +14,18 @@ export default function FinancialCommandControlRoom() {
   const [showMoneyDrawer, setShowMoneyDrawer] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState('DD-2048');
 
-  const waterfall = calculateEconomicWaterfall(100.00);
-  const layers = calculateContributionLayers(100.00);
-  const moneyLineage = followTheMoney(selectedOrder);
-  const topSurfaces = getMostProfitableSurfaces();
-  const lossSurfaces = getLossMakingSurfaces();
+  const waterfall = calculateEconomicWaterfall(0);
+  const layers = calculateContributionLayers(0);
+  const moneyLineage = { lineageSteps: [] };
+  const topSurfaces: any[] = [];
+  const lossSurfaces: any[] = [];
 
-  const totalGrossCustomerSpend = 14250.00;
-  const totalNetRevenue = 9840.00;
-  const totalNetContribution = 6650.00;
-  const totalReceivables = DEMO_PAYOUTS.filter(p => p.state === 'EXPECTED').reduce((sum, p) => sum + p.netExpectedGbp, 0);
+  const totalGrossCustomerSpend = 0;
+  const totalNetRevenue = 0;
+  const totalNetContribution = 0;
+  const totalReceivables = 0;
+  
+  const DEMO_ECONOMIC_RSA = { rawRsaPct: 0, capturedRsaPct: 0, growthActivatedRsaPct: 0, economicallyProductiveRsaPct: 0 };
 
   return (
     <div className="min-h-screen bg-[#0A0B0D] text-[#F5F6F7] p-6">
@@ -146,31 +145,41 @@ export default function FinancialCommandControlRoom() {
               <span className="text-[10px] text-[#626770]">Ranked by Net Contribution</span>
             </div>
             <div className="space-y-3">
-              {topSurfaces.map(surf => (
-                <div key={surf.rank} className="bg-[#121418] border border-white/5 rounded-lg p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold text-[#D6A84B] text-sm w-6">#{surf.rank}</span>
-                    <div>
-                      <div className="font-display text-sm font-bold text-[#F5F6F7]">{surf.entityName}</div>
-                      <div className="text-[10px] text-[#626770]">{surf.entityType}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-6 text-[10px]">
-                    <div>
-                      <span className="text-[#626770]">Gross: </span>
-                      <strong className="text-[#F5F6F7]">£{surf.grossSalesGbp.toLocaleString()}</strong>
-                    </div>
-                    <div>
-                      <span className="text-[#626770]">Net Contribution: </span>
-                      <strong className="text-[#22C55E]">£{surf.netContributionGbp.toLocaleString()}</strong>
-                    </div>
-                    <div>
-                      <span className="text-[#626770]">Margin: </span>
-                      <strong className="text-[#38BDF8]">{surf.contributionMarginPct}%</strong>
-                    </div>
+              {topSurfaces.length === 0 ? (
+                <div className="bg-[#121418] border border-white/5 rounded-lg p-8 flex flex-col items-center justify-center text-center space-y-3 industrial-panel">
+                  <AlertTriangle className="w-8 h-8 text-[#D6A84B]" />
+                  <div className="font-display text-sm font-bold text-[#F5F6F7]">NO REAL SURFACE DATA AVAILABLE</div>
+                  <div className="text-[10px] text-[#626770] max-w-md">
+                    Cannot calculate surface profitability. Requires active connector to Marketplace API or internal accounting records to determine actual net contribution margins.
                   </div>
                 </div>
-              ))}
+              ) : (
+                topSurfaces.map(surf => (
+                  <div key={surf.rank} className="bg-[#121418] border border-white/5 rounded-lg p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold text-[#D6A84B] text-sm w-6">#{surf.rank}</span>
+                      <div>
+                        <div className="font-display text-sm font-bold text-[#F5F6F7]">{surf.entityName}</div>
+                        <div className="text-[10px] text-[#626770]">{surf.entityType}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-6 text-[10px]">
+                      <div>
+                        <span className="text-[#626770]">Gross: </span>
+                        <strong className="text-[#F5F6F7]">£{surf.grossSalesGbp.toLocaleString()}</strong>
+                      </div>
+                      <div>
+                        <span className="text-[#626770]">Net Contribution: </span>
+                        <strong className="text-[#22C55E]">£{surf.netContributionGbp.toLocaleString()}</strong>
+                      </div>
+                      <div>
+                        <span className="text-[#626770]">Margin: </span>
+                        <strong className="text-[#38BDF8]">{surf.contributionMarginPct}%</strong>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -214,12 +223,22 @@ export default function FinancialCommandControlRoom() {
             </div>
 
             <div className="space-y-2">
-              {moneyLineage.lineageSteps.map((step, idx) => (
-                <div key={idx} className="bg-[#121418] border border-white/5 p-3 rounded-lg flex items-center gap-3">
-                  <span className="w-6 font-bold text-[#D6A84B] text-center">#{idx + 1}</span>
-                  <span className="text-[#F5F6F7] text-xs">{step}</span>
+              {moneyLineage.lineageSteps.length === 0 ? (
+                <div className="bg-[#121418] border border-white/5 rounded-lg p-6 flex flex-col items-center justify-center text-center space-y-3 industrial-panel">
+                  <AlertTriangle className="w-6 h-6 text-[#D6A84B]" />
+                  <div className="font-display text-xs font-bold text-[#F5F6F7]">CANNOT FOLLOW THE MONEY</div>
+                  <div className="text-[10px] text-[#626770] max-w-sm">
+                    No real transaction data exists for order {selectedOrder}. Connect a real ledger or payment gateway to trace funds.
+                  </div>
                 </div>
-              ))}
+              ) : (
+                moneyLineage.lineageSteps.map((step: string, idx: number) => (
+                  <div key={idx} className="bg-[#121418] border border-white/5 p-3 rounded-lg flex items-center gap-3">
+                    <span className="w-6 font-bold text-[#D6A84B] text-center">#{idx + 1}</span>
+                    <span className="text-[#F5F6F7] text-xs">{step}</span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         )}

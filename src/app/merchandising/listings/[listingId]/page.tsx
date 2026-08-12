@@ -8,18 +8,13 @@ import {
   History, Activity, ClipboardCheck, AlertTriangle, CheckCircle2,
   ExternalLink, ArrowRight, Eye, RefreshCw
 } from 'lucide-react';
-import {
-  DEMO_LISTINGS, MERCHANDISING_STRATEGIES, COPY_VARIANTS,
-  SEARCH_TERMS, GALLERY_SEQUENCES, LISTING_PRICES, MERCHANDISING_EXPERIMENTS,
-  BRAND_VOCABULARY
-} from '@/lib/merchandising/demo-merchandising-data';
 
 function statusColor(status: string): string {
   const map: Record<string, string> = {
     LIVE: '#22C55E', APPROVED: '#22C55E', PUBLISHED: '#22C55E', PASS: '#22C55E',
     RUNNING: '#D6A84B', OPTIMISING: '#D6A84B', GENERATING: '#D6A84B',
     STALE: '#F59E0B', DRIFTED: '#EF4444', NEEDS_REVIEW: '#F97316', REJECTED: '#EF4444', FAILED: '#EF4444',
-    DRAFT: '#6B7280',
+    DRAFT: '#6B7280', UNKNOWN: '#6B7280'
   };
   return map[status] ?? '#6B7280';
 }
@@ -32,6 +27,21 @@ function StatusPill({ status }: { status: string }) {
     >
       {status.replace(/_/g, ' ')}
     </span>
+  );
+}
+
+function EmptyStatePanel({ title, message, action }: { title: string, message: string, action: string }) {
+  return (
+    <div className="industrial-panel p-12 flex flex-col items-center justify-center text-center space-y-4 border border-white/8 rounded-xl bg-[#0E1014]">
+      <AlertTriangle className="w-8 h-8 text-[#D6A84B]" />
+      <div className="font-display text-sm tracking-wider text-[#F5F6F7]">{title}</div>
+      <div className="font-data text-xs text-[#626770] max-w-lg">
+        {message}
+      </div>
+      <div className="font-display text-[10px] text-[#D6A84B] px-4 py-2 border border-[#D6A84B]/30 bg-[#D6A84B]/10 rounded-lg">
+        {action}
+      </div>
+    </div>
   );
 }
 
@@ -64,10 +74,22 @@ export default function ListingDetailCommandCentre({
   const { listingId } = use(params);
   const [activeTab, setActiveTab] = useState<TabId>('overview');
 
-  const listing = DEMO_LISTINGS.find(l => l.id === listingId) || DEMO_LISTINGS[0];
-  const strategy = MERCHANDISING_STRATEGIES[listing.merchandisingStrategyId || 'strat-htt-amz'];
-  const price = LISTING_PRICES[listing.currentPriceId || 'pr-htt-amz'];
-  const gallery = GALLERY_SEQUENCES[listing.id] || GALLERY_SEQUENCES['lst-etsy-htt-001'] || [];
+  const listing = {
+    id: listingId,
+    marketplaceName: 'UNVERIFIED MARKETPLACE',
+    listingVersion: '0',
+    status: 'UNKNOWN',
+    productName: 'No Product Data',
+    productSku: 'NO-SKU',
+    externalUrl: '',
+    listingQualityScore: 0,
+    discoverabilityScore: 0,
+    conversionRatePct: 0,
+    netRevenueGbp: 0,
+    complianceStatus: 'UNKNOWN',
+    performanceState: 'UNKNOWN',
+    isDrifted: false,
+  };
 
   return (
     <div className="min-h-screen bg-[#0A0B0D] text-[#F5F6F7] p-6">
@@ -98,12 +120,7 @@ export default function ListingDetailCommandCentre({
             </div>
           </div>
           <div className="flex items-center gap-3 font-data text-xs">
-            {listing.externalUrl && (
-              <a href={listing.externalUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 bg-[#121418] hover:bg-[#17191E] border border-white/10 text-[#A2A6AD] px-3 py-2 rounded-lg transition-colors">
-                <ExternalLink className="w-3.5 h-3.5" /> LIVE MARKETPLACE LISTING
-              </a>
-            )}
-            <button className="flex items-center gap-1.5 bg-[#D6A84B] hover:bg-[#e2b558] text-[#0A0B0D] font-display text-[10px] font-bold px-4 py-2 rounded-lg transition-colors">
+            <button className="flex items-center gap-1.5 bg-[#D6A84B] hover:bg-[#e2b558] text-[#0A0B0D] font-display text-[10px] font-bold px-4 py-2 rounded-lg transition-colors opacity-50 cursor-not-allowed">
               <RefreshCw className="w-3.5 h-3.5" /> VERIFY LIVE STATE
             </button>
           </div>
@@ -112,14 +129,14 @@ export default function ListingDetailCommandCentre({
         {/* Key Instrumentation */}
         <div className="grid grid-cols-6 gap-3">
           {[
-            { label: 'QUALITY SCORE', value: `${listing.listingQualityScore}%`, color: listing.listingQualityScore >= 85 ? '#22C55E' : '#D6A84B' },
-            { label: 'DISCOVERABILITY', value: `${listing.discoverabilityScore}%`, color: '#38BDF8' },
-            { label: 'CONVERSION RATE', value: `${listing.conversionRatePct}%`, color: '#22C55E' },
-            { label: 'NET MARGIN', value: price ? `${price.netMarginPct}%` : '90%', color: '#22C55E' },
-            { label: 'NET REVENUE', value: `£${listing.netRevenueGbp.toFixed(2)}`, color: '#22C55E' },
-            { label: 'COMPLIANCE', value: listing.complianceStatus, color: listing.complianceStatus === 'PASS' ? '#22C55E' : '#EF4444' },
+            { label: 'QUALITY SCORE', value: '-', color: '#626770' },
+            { label: 'DISCOVERABILITY', value: '-', color: '#626770' },
+            { label: 'CONVERSION RATE', value: '-', color: '#626770' },
+            { label: 'NET MARGIN', value: '-', color: '#626770' },
+            { label: 'NET REVENUE', value: '-', color: '#626770' },
+            { label: 'COMPLIANCE', value: 'UNKNOWN', color: '#626770' },
           ].map(s => (
-            <div key={s.label} className="bg-[#0E1014] border border-white/8 rounded-xl p-3 text-center space-y-1">
+            <div key={s.label} className="industrial-panel bg-[#0E1014] border border-white/8 rounded-xl p-3 text-center space-y-1">
               <div className="font-data text-[9px] text-[#626770] tracking-wider">{s.label}</div>
               <div className="font-data text-lg font-bold" style={{ color: s.color }}>{s.value}</div>
             </div>
@@ -127,7 +144,7 @@ export default function ListingDetailCommandCentre({
         </div>
 
         {/* 16 Tabs Bar */}
-        <div className="flex items-center gap-1 overflow-x-auto bg-[#0E1014] border border-white/8 rounded-xl p-1">
+        <div className="flex items-center gap-1 overflow-x-auto bg-[#0E1014] border border-white/8 rounded-xl p-1 industrial-panel">
           {TABS.map(tab => {
             const Icon = tab.icon;
             return (
@@ -146,168 +163,63 @@ export default function ListingDetailCommandCentre({
         {/* TAB PANELS */}
         {activeTab === 'overview' && (
           <div className="grid grid-cols-12 gap-4 font-data text-xs">
-            <div className="col-span-6 bg-[#0E1014] border border-white/8 rounded-xl p-4 space-y-3">
+            <div className="col-span-6 industrial-panel bg-[#0E1014] border border-white/8 rounded-xl p-4 space-y-3">
               <div className="font-display text-xs tracking-wider text-[#626770]">CANONICAL VS CHANNEL SEPARATION</div>
-              <div className="space-y-2">
-                <div className="bg-[#121418] p-3 rounded-lg border border-white/5 space-y-1">
-                  <div className="text-[9px] text-[#D6A84B] font-bold">CANONICAL PRODUCT (PRODUCT FACTORY)</div>
-                  <div className="text-[#F5F6F7]">{listing.productName} ({listing.productSku})</div>
-                  <div className="text-[10px] text-[#626770]">Immutable master author, publisher, facts, source provenance</div>
-                </div>
-                <div className="bg-[#121418] p-3 rounded-lg border border-[#D6A84B]/30 space-y-1">
-                  <div className="text-[9px] text-[#22C55E] font-bold">CHANNEL LISTING ({listing.marketplaceName})</div>
-                  <div className="text-[#F5F6F7]">Marketplace Listing ID: {listing.externalListingId}</div>
-                  <div className="text-[10px] text-[#626770]">Channel copy, search keywords, gallery sequence, channel pricing</div>
-                </div>
-              </div>
+              <EmptyStatePanel title="NO CANONICAL PRODUCT" message="Cannot verify canonical product without database connection." action="CONNECT DATABASE" />
             </div>
-            <div className="col-span-6 bg-[#0E1014] border border-white/8 rounded-xl p-4 space-y-3">
+            <div className="col-span-6 industrial-panel bg-[#0E1014] border border-white/8 rounded-xl p-4 space-y-3">
               <div className="font-display text-xs tracking-wider text-[#626770]">HEALTH & TELEMETRY SUMMARY</div>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-[#626770]">Performance State</span>
-                  <span className="text-[#22C55E] font-bold">{listing.performanceState}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#626770]">Last Verified</span>
-                  <span className="text-[#F5F6F7]">{listing.lastVerifiedAt?.substring(0, 16)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#626770]">Drift Status</span>
-                  <span className={listing.isDrifted ? 'text-[#EF4444] font-bold' : 'text-[#22C55E]'}>{listing.isDrifted ? 'DRIFTED' : 'SYNCHRONISED'}</span>
-                </div>
-              </div>
+              <EmptyStatePanel title="NO TELEMETRY" message="No channel integration available." action="CONNECT CHANNEL" />
             </div>
           </div>
         )}
 
-        {activeTab === 'positioning' && strategy && (
-          <div className="bg-[#0E1014] border border-white/8 rounded-xl p-5 space-y-4 font-data text-xs">
+        {activeTab === 'positioning' && (
+          <div className="industrial-panel bg-[#0E1014] border border-white/8 rounded-xl p-5 space-y-4 font-data text-xs">
             <div className="font-display text-xs tracking-wider text-[#626770]">APPROVED CHANNEL POSITIONING FRAMEWORK</div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <div className="text-[9px] text-[#626770]">PRIMARY AUDIENCE</div>
-                <div className="text-[#F5F6F7] bg-[#121418] p-2.5 rounded border border-white/5">{strategy.primaryAudience}</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-[9px] text-[#626770]">PRIMARY COMMERCIAL ANGLE</div>
-                <div className="text-[#F5F6F7] bg-[#121418] p-2.5 rounded border border-white/5">{strategy.primaryCommercialAngle}</div>
-              </div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-[9px] text-[#626770]">VALUE PROPOSITION</div>
-              <div className="text-[#22C55E] bg-[#121418] p-2.5 rounded border border-white/5 font-bold">{strategy.primaryValueProp}</div>
-            </div>
+            <EmptyStatePanel title="NO POSITIONING DATA" message="Requires a verified strategy record." action="CREATE STRATEGY" />
           </div>
         )}
 
         {activeTab === 'copy' && (
           <div className="space-y-3 font-data text-xs">
-            {COPY_VARIANTS.map(c => (
-              <div key={c.id} className="bg-[#0E1014] border border-white/8 rounded-xl p-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-display text-xs text-[#D6A84B] font-bold">{c.fieldName.toUpperCase()} VARIANT</span>
-                  <span className="text-[9px] text-[#22C55E] border border-[#22C55E]/30 bg-[#22C55E]/10 px-2 py-0.5 rounded">{c.contentFidelity}</span>
-                </div>
-                <div className="text-[#F5F6F7] bg-[#121418] p-3 rounded border border-white/5">{c.variantText}</div>
-                <div className="flex items-center gap-4 text-[9px] text-[#626770]">
-                  <span>Chars: {c.characterCount} / {c.characterLimit}</span>
-                  <span>Condensed: {c.isCondensed ? 'YES' : 'NO'}</span>
-                  <span>Status: <strong className="text-[#22C55E]">{c.status}</strong></span>
-                </div>
-              </div>
-            ))}
+            <EmptyStatePanel title="NO COPY VARIANTS" message="Copy generation requires an active merchandising pipeline." action="CONFIGURE PIPELINE" />
           </div>
         )}
 
         {activeTab === 'search' && (
-          <div className="bg-[#0E1014] border border-white/8 rounded-xl overflow-hidden font-data text-xs">
+          <div className="industrial-panel bg-[#0E1014] border border-white/8 rounded-xl overflow-hidden font-data text-xs">
             <div className="px-4 py-3 border-b border-white/8 font-display text-xs tracking-wider text-[#626770]">APPROVED SEARCH INTENTS & KEYWORDS</div>
-            <div className="divide-y divide-white/5">
-              {SEARCH_TERMS.map(st => (
-                <div key={st.id} className="p-4 flex items-center justify-between">
-                  <div>
-                    <div className="font-bold text-[#F5F6F7]">{st.term}</div>
-                    <div className="text-[9px] text-[#626770]">{st.intentCategory} · Source: {st.sourceType}</div>
-                  </div>
-                  <div className="flex items-center gap-4 text-[10px]">
-                    <span className="text-[#626770]">Vol: <strong className="text-[#F5F6F7]">{st.volumeEstimate}</strong></span>
-                    <span className="text-[#626770]">CTR: <strong className="text-[#22C55E]">{(st.performanceCtr! * 100).toFixed(1)}%</strong></span>
-                    <StatusPill status={st.isApproved ? 'APPROVED' : 'BLOCKED'} />
-                  </div>
-                </div>
-              ))}
-            </div>
+            <EmptyStatePanel title="NO SEARCH INTENT DATA" message="Requires a verified keyword taxonomy record." action="CONNECT SEO TOOLS" />
           </div>
         )}
 
         {activeTab === 'assets' && (
           <div className="space-y-3 font-data text-xs">
             <div className="font-display text-xs tracking-wider text-[#626770]">GALLERY STORY SEQUENCE</div>
-            <div className="grid grid-cols-3 gap-3">
-              {gallery.map(item => (
-                <div key={item.id} className="bg-[#0E1014] border border-white/8 rounded-xl p-3 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-[#D6A84B]">#{item.position} · {item.purpose}</span>
-                    <StatusPill status={item.status} />
-                  </div>
-                  <div className="h-24 bg-[#121418] rounded border border-white/5 flex items-center justify-center text-[#626770] text-[10px]">
-                    [{item.label}]
-                  </div>
-                  {item.overlayMessage && <div className="text-[9px] text-[#A2A6AD] italic">&ldquo;{item.overlayMessage}&rdquo;</div>}
-                </div>
-              ))}
-            </div>
+            <EmptyStatePanel title="NO GALLERY ASSETS" message="Asset sequence cannot be verified." action="CONNECT ASSET LIBRARY" />
           </div>
         )}
 
-        {activeTab === 'price' && price && (
-          <div className="bg-[#0E1014] border border-white/8 rounded-xl p-5 space-y-4 font-data text-xs">
+        {activeTab === 'price' && (
+          <div className="industrial-panel bg-[#0E1014] border border-white/8 rounded-xl p-5 space-y-4 font-data text-xs">
             <div className="font-display text-xs tracking-wider text-[#626770]">MARKETPLACE PRICING & NET CONTRIBUTION</div>
-            <div className="grid grid-cols-4 gap-4">
-              <div className="bg-[#121418] p-3 rounded border border-white/5">
-                <div className="text-[#626770] text-[9px]">MARKETPLACE PRICE</div>
-                <div className="text-[#F5F6F7] font-bold text-lg">£{price.marketplacePriceGbp}</div>
-              </div>
-              <div className="bg-[#121418] p-3 rounded border border-white/5">
-                <div className="text-[#626770] text-[9px]">EST. PLATFORM FEE ({price.estimatedPlatformFeePct}%)</div>
-                <div className="text-[#EF4444] font-bold text-lg">-£{((price.marketplacePriceGbp * price.estimatedPlatformFeePct)/100).toFixed(2)}</div>
-              </div>
-              <div className="bg-[#121418] p-3 rounded border border-white/5">
-                <div className="text-[#626770] text-[9px]">EST. NET PROCEEDS</div>
-                <div className="text-[#22C55E] font-bold text-lg">£{price.estimatedNetProceedsGbp}</div>
-              </div>
-              <div className="bg-[#121418] p-3 rounded border border-white/5">
-                <div className="text-[#626770] text-[9px]">NET MARGIN</div>
-                <div className="text-[#22C55E] font-bold text-lg">{price.netMarginPct}%</div>
-              </div>
-            </div>
+            <EmptyStatePanel title="NO PRICING DATA" message="Cannot verify real-time marketplace pricing or fees." action="CONNECT COMMERCE API" />
           </div>
         )}
 
         {activeTab === 'compliance' && (
-          <div className="bg-[#0E1014] border border-white/8 rounded-xl p-5 space-y-4 font-data text-xs">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-[#22C55E]" />
-              <span className="font-display text-sm text-[#22C55E] font-bold">COMPLIANCE PASSED — ZERO BANNED CLAIMS</span>
-            </div>
-            <div className="space-y-2">
-              {BRAND_VOCABULARY.map(b => (
-                <div key={b.id} className="flex items-center justify-between bg-[#121418] p-2.5 rounded border border-white/5">
-                  <span className="font-bold text-[#F5F6F7]">{b.term}</span>
-                  <StatusPill status={b.classification} />
-                  <span className="text-[#626770] text-[10px]">{b.reason}</span>
-                </div>
-              ))}
-            </div>
+          <div className="industrial-panel bg-[#0E1014] border border-white/8 rounded-xl p-5 space-y-4 font-data text-xs">
+            <div className="font-display text-xs tracking-wider text-[#626770]">COMPLIANCE STATUS</div>
+            <EmptyStatePanel title="NO COMPLIANCE SIGNALS" message="Brand vocabulary checks require a connected truth layer." action="CONFIGURE COMPLIANCE" />
           </div>
         )}
 
         {/* Fallback panel for remaining tabs */}
         {!['overview', 'positioning', 'copy', 'search', 'assets', 'price', 'compliance'].includes(activeTab) && (
-          <div className="bg-[#0E1014] border border-white/8 rounded-xl p-8 text-center font-data text-xs space-y-2">
+          <div className="industrial-panel bg-[#0E1014] border border-white/8 rounded-xl p-8 text-center font-data text-xs space-y-2">
             <div className="font-display text-sm text-[#D6A84B]">{activeTab.toUpperCase().replace('-', ' ')} PANEL</div>
-            <div className="text-[#626770]">Telemetry and audit logs actively tracked for this listing.</div>
+            <EmptyStatePanel title="NO TRUTHFUL DATA" message="Drawdown OS cannot prove the existence of this information without a verified connection." action="MANAGE CONNECTORS" />
           </div>
         )}
 

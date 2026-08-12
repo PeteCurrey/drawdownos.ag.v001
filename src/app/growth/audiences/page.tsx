@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { Layers, ChevronRight, Users, Download, DollarSign, TrendingUp } from 'lucide-react';
-import { DEMO_LEAD_MAGNETS } from '@/lib/growth/demo-growth-data';
 
 export default function OwnedAudiencePage() {
   return (
@@ -36,33 +35,13 @@ export default function OwnedAudiencePage() {
             FREE PRODUCT / LEAD MAGNET CONVERSION TELEMETRY
           </div>
           <div className="space-y-3">
-            {DEMO_LEAD_MAGNETS.map(lm => (
-              <div key={lm.id} className="bg-[#121418] border border-white/5 rounded-lg p-4 flex items-center justify-between">
-                <div className="space-y-1">
-                  <div className="font-display text-sm font-bold text-[#F5F6F7]">{lm.title}</div>
-                  <div className="text-[10px] text-[#626770]">Format: {lm.formatType} · Source: {lm.sourcePublicationId}</div>
-                </div>
-
-                <div className="flex items-center gap-6 text-[10px]">
-                  <div>
-                    <span className="text-[#626770]">Downloads: </span>
-                    <strong className="text-[#F5F6F7]">{lm.downloadsCount}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[#626770]">Email Joins: </span>
-                    <strong className="text-[#38BDF8]">{lm.emailJoinsCount}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[#626770]">Paid Buyers: </span>
-                    <strong className="text-[#22C55E]">{lm.paidConversionsCount}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[#626770]">Downstream Net: </span>
-                    <strong className="text-[#22C55E]">£{lm.downstreamNetRevenueGbp.toLocaleString()}</strong>
-                  </div>
-                </div>
+            <div className="bg-[#121418] border border-white/5 rounded-lg p-8 flex flex-col items-center justify-center text-center space-y-3 industrial-panel">
+              <Layers className="w-8 h-8 text-[#D6A84B]" />
+              <div className="font-display text-sm font-bold text-[#F5F6F7]">NO REAL AUDIENCE DATA AVAILABLE</div>
+              <div className="text-[10px] text-[#626770] max-w-md">
+                Cannot display audience telemetry. Requires active connection to CRM, ESP (e.g., Klaviyo, Mailchimp), or opt-in analytics to trace lead magnet conversions.
               </div>
-            ))}
+            </div>
           </div>
         </div>
 
