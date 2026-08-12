@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-shell: #0A0B0D;
+    --bg-panel: #121418;
+    --bg-panel-alt: #17191E;
+    --bg-elevated: #1C1F24;
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.16);
+    --text-primary: #F5F6F7;
+    --text-secondary: #A2A6AD;
+    --text-muted: #626770;
+    --accent-amber: #D6A84B;
+    --accent-amber-glow: rgba(214, 168, 75, 0.25);
+    --signal-active: #FF6A18;
+    --status-success: #22C55E;
+    --status-danger: #EF4444;
+    --status-info: #38BDF8;
+  }
+}
+
+body {
+  background-color: var(--bg-shell);
+  color: var(--text-primary);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Technical & Industrial Typography */
+.font-display {
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.font-data {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Phoenix / Zeus-X Panel Module Styling */
+.industrial-panel {
+  background: linear-gradient(180deg, #17191E 0%, #121418 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.industrial-panel-elevated {
+  background: linear-gradient(180deg, #22262D 0%, #1C1F24 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.08), 0 12px 32px rgba(0, 0, 0, 0.6);
+}
+
+.industrial-panel-inset {
+  background: #0D0E11;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+/* Glowing Industrial Telemetry Accent Indicators */
+.amber-glow-box {
+  box-shadow: 0 0 16px rgba(214, 168, 75, 0.25);
+}
+
+.orange-signal-glow {
+  box-shadow: 0 0 16px rgba(255, 106, 24, 0.35);
+}
+
+.status-beacon-green {
+  background-color: #22C55E;
+  box-shadow: 0 0 8px #22C55E;
+}
+
+.status-beacon-amber {
+  background-color: #D6A84B;
+  box-shadow: 0 0 8px #D6A84B;
+}
+
+.status-beacon-red {
+  background-color: #EF4444;
+  box-shadow: 0 0 8px #EF4444;
+}
+
+.status-beacon-grey {
+  background-color: #626770;
+}
+
+/* Custom Scrollbar for High-Density Telemetry */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0A0B0D;
+}
+::-webkit-scrollbar-thumb {
+  background: #252830;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3A3F4B;
+}
+
