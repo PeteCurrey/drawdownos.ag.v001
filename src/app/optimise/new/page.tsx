@@ -35,7 +35,7 @@ export default function ExperimentDesignerPage() {
               <h3 className="font-display text-[#38BDF8] mb-4 text-sm tracking-wider">Prompt</h3>
               <textarea 
                 className="w-full bg-black/50 border border-white/10 rounded-md p-4 text-gray-300 font-data h-40 focus:outline-none focus:border-[#D6A84B]"
-                placeholder="State your hypothesis or test idea... e.g. 'Test £39 for How to Trade on Gumroad UK'"
+                placeholder="State your hypothesis or test idea... e.g. 'Test £39 price point for PDF product on Whop Marketplace'"
               />
               <button className="mt-4 bg-white/5 hover:bg-white/10 text-white font-display text-xs px-4 py-3 rounded-md border border-white/10 w-full transition-colors">
                 PARSE & DESIGN TEST -&gt;

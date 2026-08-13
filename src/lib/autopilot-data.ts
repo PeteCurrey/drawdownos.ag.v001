@@ -96,7 +96,7 @@ export const DEFAULT_AUTOPILOT_POLICY: AutopilotPolicyConfig = {
   maxAffiliateCommissionPct: 40.00,
   allowedCurrencies: ['GBP', 'USD', 'EUR', 'AUD', 'CAD'],
   allowedTerritories: ['GB', 'US', 'CA', 'AU', 'DE', 'FR', 'ES', 'NL', 'NZ'],
-  allowedMarketplaces: ['ch-whop', 'ch-gumroad', 'ch-etsy', 'ch-amazon-kdp', 'ch-publishdrive', 'ch-payhip', 'ch-lemonsqueezy'],
+  allowedMarketplaces: ['ch-whop'],
   allowedAggregators: ['ch-publishdrive', 'ch-draft2digital'],
 };
 

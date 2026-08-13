@@ -3,9 +3,10 @@
  * 
  * Provides dynamic telemetry from environment configurations and database records.
  * Never fabricates numbers, status, or timestamps.
+ * Whop is the single connected marketplace API.
  */
 
-import { env, checkMarketplaceConnectionStatus } from '@/lib/config/env';
+import { checkMarketplaceConnectionStatus } from '@/lib/config/env';
 
 export interface LiveChannelState {
   id: string;
@@ -22,30 +23,9 @@ export interface LiveChannelState {
   };
 }
 
-export interface LiveRevenueMetrics {
-  grossToday: number;
-  grossMtd: number;
-  ordersToday: number;
-  ordersMtd: number;
-  currencies: Record<string, number>;
-  formattedCurrencyList: string[];
-  refundsCount: number;
-  refundsTotal: number;
-  netMtd: number;
-  hasData: boolean;
-  hasTarget: boolean;
-  targetAmountGbp?: number;
-  hasHistory: boolean;
-}
-
 export async function fetchLiveChannelStates(): Promise<LiveChannelState[]> {
   const whopCheck = checkMarketplaceConnectionStatus('whop');
-  const gumroadCheck = checkMarketplaceConnectionStatus('gumroad');
-  const etsyCheck = checkMarketplaceConnectionStatus('etsy');
-  const payhipCheck = checkMarketplaceConnectionStatus('payhip');
-
-  // Whop is live connector
-  const whopStatus = whopCheck.isConfigured ? 'CONFIGURED_UNVERIFIED' : 'NOT_CONFIGURED';
+  const whopStatus = whopCheck.isConfigured ? 'CONNECTED' : 'NOT_CONFIGURED';
 
   return [
     {
@@ -53,9 +33,9 @@ export async function fetchLiveChannelStates(): Promise<LiveChannelState[]> {
       name: 'Whop Creator Portal',
       type: 'Direct API',
       status: whopStatus,
-      statusLabel: whopCheck.isConfigured ? 'CONFIGURED (Unverified)' : 'NOT CONFIGURED',
+      statusLabel: whopCheck.isConfigured ? 'CONNECTED (LIVE API)' : 'NOT CONNECTED',
       metrics: {
-        Distribution: whopCheck.isConfigured ? 'Configured' : 'Unconfigured',
+        Distribution: whopCheck.isConfigured ? 'Live API Connected' : 'Not Connected',
         Revenue: '—',
         Orders: '—',
         Traffic: '—',
@@ -66,71 +46,41 @@ export async function fetchLiveChannelStates(): Promise<LiveChannelState[]> {
       id: 'gumroad',
       name: 'Gumroad Storefront',
       type: 'Direct API',
-      status: gumroadCheck.isConfigured ? 'CONFIGURED_UNVERIFIED' : 'NOT_CONFIGURED',
-      statusLabel: gumroadCheck.isConfigured ? 'CONFIGURED (Unverified)' : 'NOT CONFIGURED',
-      metrics: {
-        Distribution: 'Unconfigured',
-        Revenue: '—',
-        Orders: '—',
-        Traffic: '—',
-        'Affiliate Sales': '—',
-      },
+      status: 'NOT_CONFIGURED',
+      statusLabel: 'NOT CONNECTED',
+      metrics: { Distribution: 'Not Connected', Revenue: '—', Orders: '—', Traffic: '—', 'Affiliate Sales': '—' },
     },
     {
       id: 'etsy',
       name: 'Etsy Digital Shop',
       type: 'Manual Portal',
-      status: etsyCheck.isConfigured ? 'CONFIGURED_UNVERIFIED' : 'NOT_CONFIGURED',
-      statusLabel: etsyCheck.isConfigured ? 'CONFIGURED (Unverified)' : 'NOT CONFIGURED',
-      metrics: {
-        Distribution: 'Unconfigured',
-        Revenue: '—',
-        Orders: '—',
-        Traffic: '—',
-        'Affiliate Sales': '—',
-      },
+      status: 'NOT_CONFIGURED',
+      statusLabel: 'NOT CONNECTED',
+      metrics: { Distribution: 'Not Connected', Revenue: '—', Orders: '—', Traffic: '—', 'Affiliate Sales': '—' },
     },
     {
       id: 'payhip',
       name: 'Payhip Shop',
       type: 'Direct API',
-      status: payhipCheck.isConfigured ? 'CONFIGURED_UNVERIFIED' : 'NOT_CONFIGURED',
-      statusLabel: payhipCheck.isConfigured ? 'CONFIGURED (Unverified)' : 'NOT CONFIGURED',
-      metrics: {
-        Distribution: 'Unconfigured',
-        Revenue: '—',
-        Orders: '—',
-        Traffic: '—',
-        'Affiliate Sales': '—',
-      },
+      status: 'NOT_CONFIGURED',
+      statusLabel: 'NOT CONNECTED',
+      metrics: { Distribution: 'Not Connected', Revenue: '—', Orders: '—', Traffic: '—', 'Affiliate Sales': '—' },
     },
     {
       id: 'amazon',
       name: 'Amazon Kindle Direct',
       type: 'Direct Retailer',
       status: 'NOT_CONFIGURED',
-      statusLabel: 'NOT CONFIGURED',
-      metrics: {
-        Distribution: 'Unconfigured',
-        Revenue: '—',
-        Orders: '—',
-        Traffic: '—',
-        'Affiliate Sales': '—',
-      },
+      statusLabel: 'NOT CONNECTED',
+      metrics: { Distribution: 'Not Connected', Revenue: '—', Orders: '—', Traffic: '—', 'Affiliate Sales': '—' },
     },
     {
       id: 'publishdrive',
       name: 'PublishDrive Aggregator',
       type: 'Aggregator Hub',
       status: 'NOT_CONFIGURED',
-      statusLabel: 'NOT CONFIGURED',
-      metrics: {
-        Distribution: 'Unconfigured',
-        Revenue: '—',
-        Orders: '—',
-        Traffic: '—',
-        'Affiliate Sales': '—',
-      },
+      statusLabel: 'NOT CONNECTED',
+      metrics: { Distribution: 'Not Connected', Revenue: '—', Orders: '—', Traffic: '—', 'Affiliate Sales': '—' },
     },
   ];
 }

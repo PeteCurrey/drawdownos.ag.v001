@@ -102,7 +102,7 @@ export default function NewConnectorWizardPage() {
               <label className="text-[10px] font-display text-[#626770]">MARKETPLACE PLATFORM NAME</label>
               <input
                 type="text"
-                placeholder="e.g. Gumroad / Lemon Squeezy / Teachable"
+                placeholder="e.g. Whop / Custom API Endpoint"
                 value={platformName}
                 onChange={(e) => setPlatformName(e.target.value)}
                 className="w-full bg-[#0D0E11] border border-white/10 rounded-lg p-3 text-xs text-[#F5F6F7] focus:outline-none focus:border-[#D6A84B]"

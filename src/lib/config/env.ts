@@ -161,7 +161,7 @@ export function checkMarketplaceConnectionStatus(marketplaceId: string): {
     return {
       id: 'whop',
       isConfigured: Boolean(process.env.WHOP_API_KEY),
-      status: process.env.WHOP_API_KEY ? 'CONNECTED' : 'MOCK_MODE',
+      status: process.env.WHOP_API_KEY ? 'CONNECTED' : 'NOT_CONFIGURED',
       keyRequired: 'WHOP_API_KEY',
     };
   }
@@ -169,7 +169,7 @@ export function checkMarketplaceConnectionStatus(marketplaceId: string): {
     return {
       id: 'gumroad',
       isConfigured: Boolean(process.env.GUMROAD_ACCESS_TOKEN),
-      status: process.env.GUMROAD_ACCESS_TOKEN ? 'CONNECTED' : 'MOCK_MODE',
+      status: process.env.GUMROAD_ACCESS_TOKEN ? 'CONNECTED' : 'NOT_CONFIGURED',
       keyRequired: 'GUMROAD_ACCESS_TOKEN',
     };
   }
@@ -177,7 +177,7 @@ export function checkMarketplaceConnectionStatus(marketplaceId: string): {
     return {
       id: 'etsy',
       isConfigured: Boolean(process.env.ETSY_API_KEY),
-      status: process.env.ETSY_API_KEY ? 'CONNECTED' : 'MOCK_MODE',
+      status: process.env.ETSY_API_KEY ? 'CONNECTED' : 'NOT_CONFIGURED',
       keyRequired: 'ETSY_API_KEY',
     };
   }
@@ -185,7 +185,7 @@ export function checkMarketplaceConnectionStatus(marketplaceId: string): {
     return {
       id: 'payhip',
       isConfigured: Boolean(process.env.PAYHIP_API_KEY),
-      status: process.env.PAYHIP_API_KEY ? 'CONNECTED' : 'MOCK_MODE',
+      status: process.env.PAYHIP_API_KEY ? 'CONNECTED' : 'NOT_CONFIGURED',
       keyRequired: 'PAYHIP_API_KEY',
     };
   }
@@ -193,7 +193,7 @@ export function checkMarketplaceConnectionStatus(marketplaceId: string): {
   return {
     id: marketplaceId,
     isConfigured: false,
-    status: 'MOCK_MODE',
+    status: 'NOT_CONFIGURED',
     keyRequired: `${marketplaceId.toUpperCase()}_API_KEY`,
   };
 }

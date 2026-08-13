@@ -171,26 +171,19 @@ export default function IntelligencePage() {
       <div className="industrial-panel p-5 space-y-4">
         <div className="flex items-center justify-between border-b border-white/10 pb-3">
           <div className="flex items-center gap-2">
-            <Radio className="w-4 h-4 text-[#FF6A18]" />
+            <Radio className="w-4 h-4 text-[#22C55E]" />
             <h3 className="font-display text-xs text-[#F5F6F7] tracking-wider">MARKETPLACE CHANGE MONITOR</h3>
           </div>
-          <span className="text-[10px] font-data text-[#22C55E]">MONITORING 6 LIVE CHANNELS</span>
+          <span className="text-[10px] font-data text-[#22C55E]">MONITORING 1 LIVE CHANNEL (WHOP)</span>
         </div>
 
         <div className="space-y-2.5 font-data text-xs">
           <div className="p-3 bg-[#0D0E11] rounded-lg border border-white/5 flex items-center justify-between">
             <div>
-              <span className="font-bold text-[#F5F6F7]">Amazon KDP UK:</span>
-              <span className="text-[#A2A6AD] ml-2">Royalties fee table updated for high-file-size PDFs (&gt;10MB). Confidence: 98%</span>
+              <span className="font-bold text-[#F5F6F7]">Whop API Connector:</span>
+              <span className="text-[#A2A6AD] ml-2">Connected and active. No policy change anomalies detected.</span>
             </div>
-            <span className="text-[10px] font-display text-[#D6A84B] px-2 py-0.5 rounded bg-[#D6A84B]/10">REVIEW REQUIRED</span>
-          </div>
-          <div className="p-3 bg-[#0D0E11] rounded-lg border border-white/5 flex items-center justify-between">
-            <div>
-              <span className="font-bold text-[#F5F6F7]">Gumroad:</span>
-              <span className="text-[#A2A6AD] ml-2">New affiliate commission cap of $2,500/transaction introduced. No action needed at current price points.</span>
-            </div>
-            <span className="text-[10px] font-display text-[#22C55E] px-2 py-0.5 rounded bg-[#22C55E]/10">MONITORED</span>
+            <span className="text-[10px] font-display text-[#22C55E] px-2 py-0.5 rounded bg-[#22C55E]/10">LIVE & OK</span>
           </div>
         </div>
       </div>

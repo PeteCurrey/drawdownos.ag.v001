@@ -1,12 +1,29 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Zap, Clock, AlertTriangle, ArrowUpRight, CheckCircle2, Server, Sliders, TrendingUp, DollarSign, Brain } from 'lucide-react';
+import { Zap, ArrowUpRight, Server, Sliders, TrendingUp, DollarSign, Brain } from 'lucide-react';
 import TelemetryGrid from '@/components/command/TelemetryGrid';
 import LiveActivityStream from '@/components/command/LiveActivityStream';
 
 export default function CommandPage() {
+  const [whopConnected, setWhopConnected] = useState(false);
+
+  useEffect(() => {
+    async function checkHealth() {
+      try {
+        const res = await fetch('/api/connectors/whop/health');
+        if (res.ok) {
+          const data = await res.json();
+          setWhopConnected(data.connected);
+        }
+      } catch {
+        setWhopConnected(false);
+      }
+    }
+    checkHealth();
+  }, []);
+
   return (
     <div className="space-y-5 pb-12">
       
@@ -16,7 +33,7 @@ export default function CommandPage() {
           <div className="flex items-center gap-2">
             <h1 className="font-display text-lg text-[#F5F6F7] font-bold">COMMAND CENTRE</h1>
             <span className="text-[10px] font-data text-[#D6A84B] px-2 py-0.5 rounded bg-[#D6A84B]/10 border border-[#D6A84B]/30">
-              OPERATING SYSTEM ACTIVE
+              TRUTH LAYER ACTIVE
             </span>
           </div>
           <p className="text-xs text-[#A2A6AD] font-data mt-0.5">
@@ -26,15 +43,16 @@ export default function CommandPage() {
 
         <div className="flex items-center gap-4 text-xs font-data">
           <div className="flex flex-col text-right">
-            <span className="text-[#626770] text-[10px]">SYSTEM STATUS</span>
-            <span className="text-[#22C55E] font-bold flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse" /> 100% OPERATIONAL
+            <span className="text-[#626770] text-[10px]">WHOP API STATUS</span>
+            <span className={`font-bold flex items-center justify-end gap-1 ${whopConnected ? 'text-[#22C55E]' : 'text-[#D6A84B]'}`}>
+              <span className={`w-2 h-2 rounded-full ${whopConnected ? 'bg-[#22C55E] animate-pulse' : 'bg-[#D6A84B]'}`} />
+              {whopConnected ? 'LIVE & CONNECTED' : 'CHECKING API...'}
             </span>
           </div>
           <div className="h-8 w-px bg-white/10" />
           <div className="flex flex-col text-right">
-            <span className="text-[#626770] text-[10px]">CANONICAL TITLES</span>
-            <span className="text-[#F5F6F7] font-bold">3 TITLES / 14 SKUs</span>
+            <span className="text-[#626770] text-[10px]">CONNECTED MARKETPLACES</span>
+            <span className="text-[#F5F6F7] font-bold">{whopConnected ? '1 MARKETPLACE (WHOP)' : '0 CONNECTED'}</span>
           </div>
         </div>
       </div>
@@ -52,11 +70,11 @@ export default function CommandPage() {
             <div className="flex items-center gap-2">
               <h3 className="font-display text-sm font-bold text-[#F5F6F7]">EXECUTIVE INTELLIGENCE</h3>
               <span className="text-[10px] font-data text-[#818CF8] px-2 py-0.5 rounded bg-[#818CF8]/10 border border-[#818CF8]/30">
-                DECISION SYSTEM ACTIVE
+                DECISION SYSTEM INITIALISING
               </span>
             </div>
             <p className="text-xs text-[#A2A6AD] font-data mt-0.5">
-              Portfolio: <strong className="text-[#F97316]">AMBER</strong> — Gumroad DE refund threshold breached · 5 priority items · 3 pending approvals · Autopilot: 14 tasks today
+              Whop API connected · 0 pending approvals · Executive recommendations require recorded sales history
             </p>
           </div>
         </div>
@@ -69,10 +87,10 @@ export default function CommandPage() {
         </Link>
       </div>
 
-      {/* Autopilot & Connector Engine Modules Grid (§42, §89) */}
+      {/* Autopilot & Connector Engine Modules Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         
-        {/* Autopilot Overview Module (§42) */}
+        {/* Autopilot Overview Module */}
         <div className="industrial-panel p-4 flex flex-wrap items-center justify-between gap-4 border-l-4 border-l-[#D6A84B]">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-[#D6A84B]/10 border border-[#D6A84B]/30 flex items-center justify-center">
@@ -80,13 +98,13 @@ export default function CommandPage() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-display text-sm font-bold text-[#F5F6F7]">AUTOPILOT ENGINE ACTIVE</h3>
+                <h3 className="font-display text-sm font-bold text-[#F5F6F7]">AUTOPILOT ENGINE</h3>
                 <span className="text-[10px] font-data text-[#D6A84B] px-2 py-0.5 rounded bg-[#D6A84B]/10 border border-[#D6A84B]/30">
-                  ASSISTED
+                  STANDBY
                 </span>
               </div>
               <p className="text-xs text-[#A2A6AD] font-data mt-0.5">
-                Objective: <strong className="text-[#F5F6F7]">GET HOW TO TRADE TO 60% RSA</strong> • 17 actions today
+                0 background tasks running · Autopilot requires user rules &amp; ingested publications
               </p>
             </div>
           </div>
@@ -99,7 +117,7 @@ export default function CommandPage() {
           </Link>
         </div>
 
-        {/* Connector Network Summary Module (§89) */}
+        {/* Connector Network Summary Module */}
         <div className="industrial-panel p-4 flex flex-wrap items-center justify-between gap-4 border-l-4 border-l-[#38BDF8]">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-[#38BDF8]/10 border border-[#38BDF8]/30 flex items-center justify-center">
@@ -109,11 +127,11 @@ export default function CommandPage() {
               <div className="flex items-center gap-2">
                 <h3 className="font-display text-sm font-bold text-[#F5F6F7]">CONNECTOR NETWORK</h3>
                 <span className="text-[10px] font-data text-[#22C55E] px-2 py-0.5 rounded bg-[#22C55E]/10 border border-[#22C55E]/30">
-                  98.4% API HEALTH
+                  1 CONNECTED (WHOP)
                 </span>
               </div>
               <p className="text-xs text-[#A2A6AD] font-data mt-0.5">
-                17 configured • 8 Autopilot certified • 4 partial • 3 manual • 1 degraded
+                1 API connected (Whop) · All other marketplaces unlinked · Zero fake connection states
               </p>
             </div>
           </div>
@@ -128,7 +146,7 @@ export default function CommandPage() {
 
       </div>
 
-      {/* Merchandising Engine Executive Card (§133) */}
+      {/* Merchandising Engine Executive Card */}
       <div className="industrial-panel p-4 flex flex-wrap items-center justify-between gap-4 border-l-4 border-l-[#818CF8]">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-[#818CF8]/10 border border-[#818CF8]/30 flex items-center justify-center">
@@ -137,12 +155,12 @@ export default function CommandPage() {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-display text-sm font-bold text-[#F5F6F7]">MERCHANDISING ENGINE</h3>
-              <span className="text-[10px] font-data text-[#22C55E] px-2 py-0.5 rounded bg-[#22C55E]/10 border border-[#22C55E]/30">
-                5 LIVE LISTINGS
+              <span className="text-[10px] font-data text-[#A2A6AD] px-2 py-0.5 rounded bg-white/5 border border-white/10">
+                0 ACTIVE LISTINGS
               </span>
             </div>
             <p className="text-xs text-[#A2A6AD] font-data mt-0.5">
-              Healthy: <strong className="text-[#22C55E]">3</strong> • Needs action: <strong className="text-[#F97316]">2</strong> • Experiments: <strong className="text-[#818CF8]">2</strong> • Drift: <strong className="text-[#EF4444]">1</strong> • Top opp: <strong className="text-[#D6A84B]">Add Etsy Gallery Worksheets (+4.5 pts)</strong>
+              Whop product ingestion ready · No mock listings displayed
             </p>
           </div>
         </div>
@@ -155,7 +173,7 @@ export default function CommandPage() {
         </Link>
       </div>
 
-      {/* Global Localisation Executive Card (§100) */}
+      {/* Global Localisation Executive Card */}
       <div className="industrial-panel p-4 flex flex-wrap items-center justify-between gap-4 border-l-4 border-l-[#38BDF8]">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-[#38BDF8]/10 border border-[#38BDF8]/30 flex items-center justify-center">
@@ -164,12 +182,12 @@ export default function CommandPage() {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-display text-sm font-bold text-[#F5F6F7]">GLOBAL LOCALISATION ENGINE</h3>
-              <span className="text-[10px] font-data text-[#22C55E] px-2 py-0.5 rounded bg-[#22C55E]/10 border border-[#22C55E]/30">
-                1 LIVE LOCALE (EN-US)
+              <span className="text-[10px] font-data text-[#A2A6AD] px-2 py-0.5 rounded bg-white/5 border border-white/10">
+                0 EDITIONS
               </span>
             </div>
             <p className="text-xs text-[#A2A6AD] font-data mt-0.5">
-              Live: <strong className="text-[#22C55E]">1</strong> • In translation: <strong className="text-[#D6A84B]">2</strong> • In review: <strong className="text-[#F97316]">1</strong> • Largest unlock: <strong className="text-[#D6A84B]">German DACH (+4.2 pts RSA)</strong> • Total unlockable: <strong className="text-[#22C55E]">+12.2 pts</strong>
+              Translation memory ready · DeepL API configured in .env.local
             </p>
           </div>
         </div>
@@ -182,7 +200,7 @@ export default function CommandPage() {
         </Link>
       </div>
 
-      {/* Executive Growth Engine Card (§142) */}
+      {/* Executive Growth Engine Card */}
       <div className="industrial-panel p-4 flex flex-wrap items-center justify-between gap-4 border-l-4 border-l-[#22C55E]">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-[#22C55E]/10 border border-[#22C55E]/30 flex items-center justify-center">
@@ -191,12 +209,12 @@ export default function CommandPage() {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-display text-sm font-bold text-[#F5F6F7]">GROWTH COMMAND</h3>
-              <span className="text-[10px] font-data text-[#22C55E] px-2 py-0.5 rounded bg-[#22C55E]/10 border border-[#22C55E]/30">
-                REVENUE, NOT THEATRE
+              <span className="text-[10px] font-data text-[#A2A6AD] px-2 py-0.5 rounded bg-white/5 border border-white/10">
+                0 ATTRIBUTED REVENUE
               </span>
             </div>
             <p className="text-xs text-[#A2A6AD] font-data mt-0.5">
-              Net Attributed: <strong className="text-[#22C55E]">£4,690</strong> • Campaigns: <strong className="text-[#D6A84B]">2 Running</strong> • Affiliates: <strong className="text-[#818CF8]">2 Active</strong> • New Customers: <strong className="text-[#38BDF8]">230</strong> • Demand Gaps: <strong className="text-[#F97316]">3</strong> • Next move: <strong className="text-[#D6A84B]">Recruit LatAm Hotmart Affiliates (+£1.8k/mo)</strong>
+              Awaiting real growth campaign telemetry and Whop payment attribution
             </p>
           </div>
         </div>
@@ -209,7 +227,7 @@ export default function CommandPage() {
         </Link>
       </div>
 
-      {/* Executive Financial Engine Card (§168) */}
+      {/* Executive Financial Engine Card */}
       <div className="industrial-panel p-4 flex flex-wrap items-center justify-between gap-4 border-l-4 border-l-[#D6A84B]">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-[#D6A84B]/10 border border-[#D6A84B]/30 flex items-center justify-center">
@@ -218,12 +236,12 @@ export default function CommandPage() {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-display text-sm font-bold text-[#F5F6F7]">FINANCIAL ENGINE</h3>
-              <span className="text-[10px] font-data text-[#22C55E] px-2 py-0.5 rounded bg-[#22C55E]/10 border border-[#22C55E]/30">
-                REVENUE IS NOT PROFIT
+              <span className="text-[10px] font-data text-[#A2A6AD] px-2 py-0.5 rounded bg-white/5 border border-white/10">
+                0 UNRECONCILED
               </span>
             </div>
             <p className="text-xs text-[#A2A6AD] font-data mt-0.5">
-              Net Revenue: <strong className="text-[#38BDF8]">£9,840</strong> • Net Contribution: <strong className="text-[#22C55E]">£6,650 (46.7% margin)</strong> • Outstanding Payouts: <strong className="text-[#D6A84B]">£1,895</strong> • Unreconciled: <strong className="text-[#22C55E]">£0.00</strong> • Best surface: <strong className="text-[#22C55E]">Amazon KDP US (52% margin)</strong> • Issue: <strong className="text-[#F97316]">£3.00 FX wire fee variance on Hotmart BR</strong>
+              Whop direct payments ledger active · All calculations derived from verified API payments
             </p>
           </div>
         </div>
