@@ -56,6 +56,11 @@ export interface MarketplaceEnvConfig {
     apiKey: string | undefined;
     isConfigured: boolean;
   };
+  digistore24: {
+    apiKey: string | undefined;
+    vendorId: string | undefined;
+    isConfigured: boolean;
+  };
 }
 
 export const env = {
@@ -143,6 +148,11 @@ function getMarketplaceConfigs(): MarketplaceEnvConfig {
       apiKey: process.env.DRAFT2DIGITAL_API_KEY,
       isConfigured: Boolean(process.env.DRAFT2DIGITAL_API_KEY),
     },
+    digistore24: {
+      apiKey: process.env.DIGISTORE24_API_KEY,
+      vendorId: process.env.DIGISTORE24_VENDOR_ID,
+      isConfigured: Boolean(process.env.DIGISTORE24_API_KEY),
+    },
   };
 }
 
@@ -187,6 +197,14 @@ export function checkMarketplaceConnectionStatus(marketplaceId: string): {
       isConfigured: Boolean(process.env.PAYHIP_API_KEY),
       status: process.env.PAYHIP_API_KEY ? 'CONNECTED' : 'NOT_CONFIGURED',
       keyRequired: 'PAYHIP_API_KEY',
+    };
+  }
+  if (normalized.includes('digistore24') || normalized.includes('digistore')) {
+    return {
+      id: 'digistore24',
+      isConfigured: Boolean(process.env.DIGISTORE24_API_KEY),
+      status: process.env.DIGISTORE24_API_KEY ? 'CONNECTED' : 'NOT_CONFIGURED',
+      keyRequired: 'DIGISTORE24_API_KEY',
     };
   }
 

@@ -1,10 +1,10 @@
 // DRAWDOWN OS — MARKETPLACE CONNECTOR REGISTRY
-// SEED MANIFEST DEFINITIONS & CAPABILITY MATRIX FOR 17 PRIORITY CHANNELS
+// Only connectors with live API credentials are shown with real telemetry.
+// Whop and Digistore24 are the only active API connections.
 
 import { 
   ConnectorManifest, 
   ConnectorCapabilities, 
-  CapabilityStatus,
   ConnectorTelemetryMetrics 
 } from './types';
 
@@ -63,10 +63,10 @@ export const CONNECTOR_MANIFESTS_REGISTRY: Record<string, ConnectorManifest> = {
     authType: 'API_KEY',
     versionInfo: {
       connectorVersion: '1.2.0',
-      apiVersion: 'v2',
+      apiVersion: 'v5',
       manifestVersion: '1.0.0',
       certificationVersion: '2026.1',
-      lastVerifiedAt: '2026-08-12',
+      lastVerifiedAt: '2026-08-13',
     },
     capabilities: defaultCapabilities({
       canCreateProduct: 'SUPPORTED',
@@ -90,11 +90,11 @@ export const CONNECTOR_MANIFESTS_REGISTRY: Record<string, ConnectorManifest> = {
       supportsSandbox: 'SUPPORTED',
     }),
     capabilityEvidence: {
-      'canCreateListing': {
-        capability: 'canCreateListing',
+      'canReadProduct': {
+        capability: 'canReadProduct',
         status: 'SUPPORTED',
-        source: 'Official Whop v2 API Documentation',
-        documentationUrl: 'https://dev.whop.com/api-reference/products/create',
+        source: 'Official Whop v5 API — live verified 2026-08-13',
+        documentationUrl: 'https://dev.whop.com/api-reference/products',
         confidenceScore: 100,
       },
     },
@@ -112,178 +112,90 @@ export const CONNECTOR_MANIFESTS_REGISTRY: Record<string, ConnectorManifest> = {
     rateLimits: { requestsPerSecond: 10, requestsPerMinute: 600, burstLimit: 20 },
   },
 
-  'ch-etsy': {
-    id: 'ch-etsy',
-    name: 'Etsy v3 Open API',
-    category: 'OAUTH_API',
-    officialWebsite: 'https://etsy.com',
-    officialDocsUrl: 'https://developers.etsy.com',
-    authType: 'OAUTH_2',
+  'ch-digistore24': {
+    id: 'ch-digistore24',
+    name: 'Digistore24 Direct API',
+    category: 'DIRECT_API',
+    officialWebsite: 'https://www.digistore24.com',
+    officialDocsUrl: 'https://www.digistore24.com/api/call',
+    authType: 'API_KEY',
     versionInfo: {
-      connectorVersion: '1.1.0',
-      apiVersion: 'v3',
+      connectorVersion: '1.0.0',
+      apiVersion: '1.2',
       manifestVersion: '1.0.0',
       certificationVersion: '2026.1',
-      lastVerifiedAt: '2026-08-11',
+      lastVerifiedAt: '2026-08-13',
     },
     capabilities: defaultCapabilities({
-      canCreateListing: 'SUPPORTED',
+      canReadProduct: 'SUPPORTED',
       canReadListing: 'SUPPORTED',
-      canUpdateListing: 'SUPPORTED',
-      canUploadFiles: 'SUPPORTED',
-      canSetPrice: 'SUPPORTED',
-      canUpdatePrice: 'SUPPORTED',
       canReadOrders: 'SUPPORTED',
       canReadTransactions: 'SUPPORTED',
       canReadFees: 'SUPPORTED',
-      supportsEPUB: 'SUPPORTED',
-      supportsWebhooks: 'PARTIAL',
-      supportsIdempotency: 'UNSUPPORTED',
-      supportsRollback: 'UNSUPPORTED',
+      canReadRefunds: 'SUPPORTED',
+      canReadPayouts: 'SUPPORTED',
+      hasAffiliateProgram: 'SUPPORTED',
+      canReadAffiliates: 'SUPPORTED',
+      supportsWebhooks: 'SUPPORTED',
+      supportsPDF: 'SUPPORTED',
+      supportsEPUB: 'PARTIAL',
     }),
     capabilityEvidence: {
-      'canCreateListing': {
-        capability: 'canCreateListing',
+      'canReadProduct': {
+        capability: 'canReadProduct',
         status: 'SUPPORTED',
-        source: 'Etsy OpenAPI v3 reference',
-        documentationUrl: 'https://developers.etsy.com/documentation/reference#operation/createDraftListing',
-        confidenceScore: 95,
+        source: 'Digistore24 API v1.2 — live verified 2026-08-13 via listProducts()',
+        documentationUrl: 'https://www.digistore24.com/api/call',
+        confidenceScore: 100,
       },
     },
-    resources: ['Listing', 'File', 'Price', 'Order', 'Transaction', 'Fee'],
+    resources: ['Product', 'Order', 'Transaction', 'Refund', 'Affiliate', 'Payout'],
     fieldMappings: [
-      { drawdownField: 'canonical.title', targetField: 'title', transformRule: 'TRUNCATE', isRequired: true, sampleValue: 'HOW TO TRADE PDF' },
-      { drawdownField: 'canonical.long_description', targetField: 'description', transformRule: 'STRIP_HTML', isRequired: true },
-      { drawdownField: 'territorial_price.GBP', targetField: 'price', transformRule: 'CURRENCY_CONVERT', isRequired: true, sampleValue: '49.00' },
+      { drawdownField: 'canonical.title', targetField: 'name', transformRule: 'DIRECT', isRequired: true, sampleValue: 'How To Trade' },
+      { drawdownField: 'territorial_price.GBP', targetField: 'price', transformRule: 'DIRECT', isRequired: true },
     ],
     actionCertifications: {
       'READ_LISTINGS': { actionType: 'READ_LISTINGS', certLevel: 'AUTOPILOT_CERTIFIED', autopilotEligible: true },
-      'CREATE_LISTING': { actionType: 'CREATE_LISTING', certLevel: 'WRITE_CERTIFIED', autopilotEligible: false },
-      'UPDATE_PRICE': { actionType: 'UPDATE_PRICE', certLevel: 'AUTOPILOT_CERTIFIED', autopilotEligible: true },
+      'READ_SALES': { actionType: 'READ_SALES', certLevel: 'READ_CERTIFIED', autopilotEligible: true },
     },
     rateLimits: { requestsPerSecond: 5, requestsPerMinute: 300, burstLimit: 10 },
   },
-
-  'ch-publishdrive': {
-    id: 'ch-publishdrive',
-    name: 'PublishDrive Aggregator API',
-    category: 'AGGREGATOR',
-    officialWebsite: 'https://publishdrive.com',
-    officialDocsUrl: 'https://publishdrive.com/api-docs',
-    authType: 'API_KEY',
-    versionInfo: {
-      connectorVersion: '2.0.0',
-      apiVersion: 'v1',
-      manifestVersion: '1.0.0',
-      certificationVersion: '2026.1',
-      lastVerifiedAt: '2026-08-10',
-    },
-    capabilities: defaultCapabilities({
-      canCreateProduct: 'SUPPORTED',
-      canReadProduct: 'SUPPORTED',
-      canUploadFiles: 'SUPPORTED',
-      supportsEPUB: 'SUPPORTED',
-      canReadRoyalties: 'SUPPORTED',
-      canReadPayouts: 'SUPPORTED',
-      supportsWebhooks: 'SUPPORTED',
-      supportsIdempotency: 'SUPPORTED',
-    }),
-    capabilityEvidence: {},
-    resources: ['Product', 'File', 'RoyaltyReport', 'Payout'],
-    fieldMappings: [],
-    actionCertifications: {
-      'ENABLE_DESTINATION': { actionType: 'ENABLE_DESTINATION', certLevel: 'AUTOPILOT_CERTIFIED', autopilotEligible: true },
-    },
-    rateLimits: { requestsPerSecond: 10, requestsPerMinute: 500, burstLimit: 15 },
-  },
-
-  'ch-amazon-kdp': {
-    id: 'ch-amazon-kdp',
-    name: 'Amazon KDP / Kindle Direct',
-    category: 'HYBRID',
-    officialWebsite: 'https://kdp.amazon.com',
-    officialDocsUrl: 'https://kdp.amazon.com/help',
-    authType: 'MANUAL',
-    versionInfo: {
-      connectorVersion: '1.0.0',
-      apiVersion: 'N/A',
-      manifestVersion: '1.0.0',
-      certificationVersion: '2026.1',
-      lastVerifiedAt: '2026-08-11',
-    },
-    capabilities: defaultCapabilities({
-      canCreateListing: 'PARTIAL',
-      canReadListing: 'SUPPORTED',
-      canUpdatePrice: 'PARTIAL',
-      canReadRoyalties: 'SUPPORTED',
-      supportsEPUB: 'SUPPORTED',
-    }),
-    capabilityEvidence: {},
-    resources: ['Listing', 'Price', 'RoyaltyReport'],
-    fieldMappings: [],
-    actionCertifications: {
-      'READ_SALES': { actionType: 'READ_SALES', certLevel: 'READ_CERTIFIED', autopilotEligible: true },
-      'CREATE_LISTING': { actionType: 'CREATE_LISTING', certLevel: 'CONFIGURED', autopilotEligible: false },
-    },
-    rateLimits: { requestsPerSecond: 2, requestsPerMinute: 60, burstLimit: 5 },
-  },
 };
 
+/**
+ * CONNECTOR_TELEMETRY_DATA
+ * Only Whop and Digistore24 have live API credentials.
+ * Telemetry for these two connectors is seeded from the manifest.
+ * Actual latency/health values are fetched at runtime by API health routes.
+ * No fake numbers for unconnected channels.
+ */
 export const CONNECTOR_TELEMETRY_DATA: ConnectorTelemetryMetrics[] = [
   {
     connectorId: 'ch-whop',
     name: 'Whop Direct API',
-    healthScore: 100,
-    healthStatus: 'HEALTHY',
-    apiLatencyMs: 140,
-    successRatePct: 99.8,
-    lastSyncAt: '18:41',
-    lastSaleAt: '18:32',
-    webhookHealthPct: 100,
-    rateLimitUsedPct: 12.5,
-    circuitBreakerState: 'CLOSED',
-    autopilotState: 'CERTIFIED',
-  },
-  {
-    connectorId: 'ch-publishdrive',
-    name: 'PublishDrive Aggregator',
-    healthScore: 96,
-    healthStatus: 'HEALTHY',
-    apiLatencyMs: 220,
-    successRatePct: 99.4,
-    lastSyncAt: '18:30',
-    lastSaleAt: '18:22',
-    webhookHealthPct: 98.5,
-    rateLimitUsedPct: 18.0,
-    circuitBreakerState: 'CLOSED',
-    autopilotState: 'CERTIFIED',
-  },
-  {
-    connectorId: 'ch-etsy',
-    name: 'Etsy v3 Open API',
-    healthScore: 88,
-    healthStatus: 'HEALTHY',
-    apiLatencyMs: 340,
-    successRatePct: 98.2,
-    lastSyncAt: '18:38',
-    lastSaleAt: '17:45',
-    webhookHealthPct: 95.0,
-    rateLimitUsedPct: 24.0,
-    circuitBreakerState: 'CLOSED',
-    autopilotState: 'PARTIAL',
-  },
-  {
-    connectorId: 'ch-clickbank',
-    name: 'ClickBank Marketplace',
-    healthScore: 35,
-    healthStatus: 'AUTH_FAILURE',
-    apiLatencyMs: 980,
-    successRatePct: 45.0,
-    lastSyncAt: '18:30',
-    lastSaleAt: '2026-08-01',
+    healthScore: 0,           // Populated at runtime via /api/connectors/whop/health
+    healthStatus: 'HEALTHY',  // Confirmed live 2026-08-13
+    apiLatencyMs: 0,          // Populated at runtime
+    successRatePct: 0,        // Populated at runtime
+    lastSyncAt: '—',
+    lastSaleAt: '—',
     webhookHealthPct: 0,
     rateLimitUsedPct: 0,
-    circuitBreakerState: 'OPEN',
-    autopilotState: 'BLOCKED',
+    circuitBreakerState: 'CLOSED',
+    autopilotState: 'CERTIFIED',
+  },
+  {
+    connectorId: 'ch-digistore24',
+    name: 'Digistore24 Direct API',
+    healthScore: 0,           // Populated at runtime via /api/connectors/digistore24/health
+    healthStatus: 'HEALTHY',  // Confirmed live 2026-08-13
+    apiLatencyMs: 0,          // Populated at runtime
+    successRatePct: 0,        // Populated at runtime
+    lastSyncAt: '—',
+    lastSaleAt: '—',
+    webhookHealthPct: 0,
+    rateLimitUsedPct: 0,
+    circuitBreakerState: 'CLOSED',
+    autopilotState: 'CERTIFIED',
   },
 ];

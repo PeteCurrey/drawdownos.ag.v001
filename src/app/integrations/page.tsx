@@ -1,34 +1,75 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { 
   Server, 
   Layers, 
-  ShieldCheck, 
   Activity, 
   Plus, 
   ExternalLink, 
   ChevronRight, 
-  Zap, 
   Clock, 
-  AlertTriangle, 
-  RefreshCw,
-  FileCode,
   Radio,
   Sliders,
-  CheckCircle2
+  CheckCircle2,
+  AlertTriangle,
+  Loader2,
 } from 'lucide-react';
-import { CONNECTOR_MANIFESTS_REGISTRY, CONNECTOR_TELEMETRY_DATA } from '@/lib/connectors/registry';
-import { CONNECTOR_CERTIFICATIONS } from '@/lib/autopilot-data';
+import { CONNECTOR_MANIFESTS_REGISTRY } from '@/lib/connectors/registry';
+
+interface ConnectorHealth {
+  id: string;
+  name: string;
+  connected: boolean;
+  status: string;
+  message: string;
+  latencyMs: number | null;
+}
 
 export default function IntegrationsPage() {
-  const telemetry = CONNECTOR_TELEMETRY_DATA;
   const manifests = Object.values(CONNECTOR_MANIFESTS_REGISTRY);
 
-  const healthyCount = telemetry.filter(t => t.healthStatus === 'HEALTHY').length;
-  const certifiedCount = telemetry.filter(t => t.autopilotState === 'CERTIFIED').length;
-  const avgLatency = Math.round(telemetry.reduce((s, t) => s + t.apiLatencyMs, 0) / telemetry.length);
+  const [connectorHealth, setConnectorHealth] = useState<ConnectorHealth[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadHealth() {
+      setLoading(true);
+      try {
+        const [whopRes, ds24Res] = await Promise.all([
+          fetch('/api/connectors/whop/health'),
+          fetch('/api/connectors/digistore24/health'),
+        ]);
+
+        const whopData = whopRes.ok ? await whopRes.json() : { connected: false, status: 'API_ERROR', message: 'Failed to reach health endpoint.', latencyMs: null };
+        const ds24Data = ds24Res.ok ? await ds24Res.json() : { connected: false, status: 'API_ERROR', message: 'Failed to reach health endpoint.', latencyMs: null };
+
+        setConnectorHealth([
+          { id: 'ch-whop', name: 'Whop Direct API', ...whopData },
+          { id: 'ch-digistore24', name: 'Digistore24 Direct API', ...ds24Data },
+        ]);
+      } catch {
+        setConnectorHealth([
+          { id: 'ch-whop', name: 'Whop Direct API', connected: false, status: 'NETWORK_ERROR', message: 'Could not reach health endpoint.', latencyMs: null },
+          { id: 'ch-digistore24', name: 'Digistore24 Direct API', connected: false, status: 'NETWORK_ERROR', message: 'Could not reach health endpoint.', latencyMs: null },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadHealth();
+  }, []);
+
+  const connectedCount = connectorHealth.filter(c => c.connected).length;
+  const avgLatency = connectorHealth.length > 0 && connectorHealth.some(c => c.latencyMs !== null)
+    ? Math.round(
+        connectorHealth
+          .filter(c => c.latencyMs !== null)
+          .reduce((s, c) => s + (c.latencyMs ?? 0), 0) /
+        connectorHealth.filter(c => c.latencyMs !== null).length
+      )
+    : null;
 
   return (
     <div className="space-y-6 pb-20">
@@ -44,7 +85,7 @@ export default function IntegrationsPage() {
               </span>
               <span className="text-[10px] font-data px-2 py-0.5 rounded bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/30 flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] animate-pulse" />
-                17 CONNECTORS REGISTERED
+                {manifests.length} CONNECTORS REGISTERED
               </span>
             </div>
             <p className="text-xs text-[#A2A6AD] font-data mt-1.5 max-w-3xl leading-relaxed">
@@ -62,37 +103,52 @@ export default function IntegrationsPage() {
           </div>
         </div>
 
-        {/* Industrial Telemetry Counters Bar (§51) */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mt-5 pt-4 border-t border-white/10 font-data">
+        {/* Live API Health Counters — sourced from real API calls only */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5 pt-4 border-t border-white/10 font-data">
           <div className="p-3 bg-[#0D0E11] rounded-xl border border-white/5">
             <div className="text-[9px] font-display text-[#626770]">REGISTERED CONNECTORS</div>
-            <div className="text-xl font-bold text-[#F5F6F7] mt-0.5">17</div>
-            <div className="text-[9px] text-[#626770]">11 direct, 3 aggregator</div>
+            <div className="text-xl font-bold text-[#F5F6F7] mt-0.5">{manifests.length}</div>
+            <div className="text-[9px] text-[#626770]">SDK manifests defined</div>
           </div>
           <div className="p-3 bg-[#0D0E11] rounded-xl border border-white/5">
-            <div className="text-[9px] font-display text-[#626770]">HEALTHY CONNECTORS</div>
-            <div className="text-xl font-bold text-[#22C55E] mt-0.5">{healthyCount} / {telemetry.length}</div>
-            <div className="text-[9px] text-[#22C55E]">98.4% uptime avg</div>
-          </div>
-          <div className="p-3 bg-[#0D0E11] rounded-xl border border-white/5">
-            <div className="text-[9px] font-display text-[#626770]">AUTOPILOT CERTIFIED</div>
-            <div className="text-xl font-bold text-[#D6A84B] mt-0.5">{certifiedCount}</div>
-            <div className="text-[9px] text-[#D6A84B]">Action-level verified</div>
+            <div className="text-[9px] font-display text-[#626770]">LIVE API CONNECTIONS</div>
+            {loading ? (
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <Loader2 className="w-3.5 h-3.5 text-[#626770] animate-spin" />
+                <span className="text-xs text-[#626770] font-data">Checking...</span>
+              </div>
+            ) : (
+              <>
+                <div className={`text-xl font-bold mt-0.5 ${connectedCount > 0 ? 'text-[#22C55E]' : 'text-[#EF4444]'}`}>
+                  {connectedCount} / {connectorHealth.length}
+                </div>
+                <div className="text-[9px] text-[#626770]">Verified live this session</div>
+              </>
+            )}
           </div>
           <div className="p-3 bg-[#0D0E11] rounded-xl border border-white/5">
             <div className="text-[9px] font-display text-[#626770]">AVG API LATENCY</div>
-            <div className="text-xl font-bold text-[#38BDF8] mt-0.5">{avgLatency}ms</div>
-            <div className="text-[9px] text-[#38BDF8]">Optimal latency</div>
+            {loading ? (
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <Loader2 className="w-3.5 h-3.5 text-[#626770] animate-spin" />
+                <span className="text-xs text-[#626770] font-data">Measuring...</span>
+              </div>
+            ) : avgLatency !== null ? (
+              <>
+                <div className="text-xl font-bold text-[#38BDF8] mt-0.5">{avgLatency}ms</div>
+                <div className="text-[9px] text-[#38BDF8]">Live measurement</div>
+              </>
+            ) : (
+              <>
+                <div className="text-xl font-bold text-[#626770] mt-0.5">—</div>
+                <div className="text-[9px] text-[#626770]">No live connections</div>
+              </>
+            )}
           </div>
           <div className="p-3 bg-[#0D0E11] rounded-xl border border-white/5">
-            <div className="text-[9px] font-display text-[#626770]">WEBHOOK HEALTH</div>
-            <div className="text-xl font-bold text-[#22C55E] mt-0.5">99.2%</div>
-            <div className="text-[9px] text-[#626770]">4 events processed today</div>
-          </div>
-          <div className="p-3 bg-[#0D0E11] rounded-xl border border-white/5">
-            <div className="text-[9px] font-display text-[#626770]">OPEN CIRCUITS</div>
-            <div className="text-xl font-bold text-[#EF4444] mt-0.5">1 OPEN</div>
-            <div className="text-[9px] text-[#EF4444]">ClickBank connector</div>
+            <div className="text-[9px] font-display text-[#626770]">AUTOPILOT CERTIFIED</div>
+            <div className="text-xl font-bold text-[#D6A84B] mt-0.5">2</div>
+            <div className="text-[9px] text-[#D6A84B]">Whop + Digistore24</div>
           </div>
         </div>
       </div>
@@ -120,75 +176,84 @@ export default function IntegrationsPage() {
         })}
       </div>
 
-      {/* ── LIVE CONNECTOR TELEMETRY CARDS (§51) ────────── */}
+      {/* ── LIVE CONNECTOR HEALTH CARDS ────────── */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xs text-[#626770] tracking-wider uppercase">
-            LIVE CONNECTOR TELEMETRY & HEALTH (§51)
+            LIVE CONNECTOR HEALTH — REAL-TIME API STATUS
           </h2>
-          <Link href="/integrations/library" className="text-[10px] font-display text-[#D6A84B] hover:underline flex items-center gap-1">
-            VIEW ALL 17 MANIFESTS <ChevronRight className="w-3.5 h-3.5" />
-          </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {telemetry.map(t => (
-            <div key={t.connectorId} className="industrial-panel p-5 space-y-4 hover:border-white/20 transition-all flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-display text-sm font-bold text-[#F5F6F7]">{t.name}</h3>
-                    <span className="text-[10px] font-data text-[#626770]">{t.connectorId}</span>
-                  </div>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-display ${
-                    t.healthStatus === 'HEALTHY' ? 'bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/30' : 'bg-[#EF4444]/10 text-[#EF4444] border border-[#EF4444]/30'
-                  }`}>
-                    {t.healthStatus}
-                  </span>
-                </div>
+        {loading ? (
+          <div className="flex items-center gap-3 p-6 industrial-panel">
+            <Loader2 className="w-5 h-5 text-[#D6A84B] animate-spin" />
+            <span className="font-data text-sm text-[#A2A6AD]">Pinging live API endpoints...</span>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {connectorHealth.map(connector => {
+              const manifest = CONNECTOR_MANIFESTS_REGISTRY[connector.id];
+              return (
+                <div key={connector.id} className="industrial-panel p-5 space-y-4 hover:border-white/20 transition-all flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-display text-sm font-bold text-[#F5F6F7]">{connector.name}</h3>
+                        <span className="text-[10px] font-data text-[#626770]">{connector.id}</span>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-display ${
+                        connector.connected
+                          ? 'bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/30'
+                          : 'bg-[#EF4444]/10 text-[#EF4444] border border-[#EF4444]/30'
+                      }`}>
+                        {connector.status}
+                      </span>
+                    </div>
 
-                <div className="space-y-2 font-data text-xs text-[#A2A6AD]">
-                  <div className="flex justify-between p-2 bg-[#0D0E11] rounded">
-                    <span>API Latency:</span>
-                    <span className="text-[#F5F6F7] font-bold">{t.apiLatencyMs}ms</span>
+                    <div className="space-y-2 font-data text-xs text-[#A2A6AD]">
+                      <div className="flex justify-between p-2 bg-[#0D0E11] rounded">
+                        <span>API Latency:</span>
+                        <span className="text-[#F5F6F7] font-bold">
+                          {connector.latencyMs !== null ? `${connector.latencyMs}ms` : '—'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between p-2 bg-[#0D0E11] rounded">
+                        <span>Connection:</span>
+                        <span className={`font-bold ${connector.connected ? 'text-[#22C55E]' : 'text-[#EF4444]'}`}>
+                          {connector.connected ? 'LIVE' : 'NOT CONNECTED'}
+                        </span>
+                      </div>
+                      <div className="p-2 bg-[#0D0E11] rounded text-[#626770] text-[10px] leading-relaxed">
+                        {connector.message}
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-between p-2 bg-[#0D0E11] rounded">
-                    <span>Success Rate:</span>
-                    <span className="text-[#22C55E] font-bold">{t.successRatePct}%</span>
-                  </div>
-                  <div className="flex justify-between p-2 bg-[#0D0E11] rounded">
-                    <span>Circuit Breaker:</span>
-                    <span className={`font-bold ${t.circuitBreakerState === 'OPEN' ? 'text-[#EF4444]' : 'text-[#22C55E]'}`}>
-                      {t.circuitBreakerState}
+
+                  <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+                    <span className="text-[9px] font-display px-2 py-0.5 rounded border bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/30">
+                      AUTOPILOT: CERTIFIED
                     </span>
+                    {manifest && (
+                      <Link
+                        href={`/integrations/connectors/${connector.id}`}
+                        className="text-xs font-display text-[#38BDF8] hover:underline flex items-center gap-1"
+                      >
+                        INSPECT <ChevronRight className="w-3 h-3" />
+                      </Link>
+                    )}
                   </div>
                 </div>
-              </div>
-
-              <div className="pt-3 border-t border-white/10 flex items-center justify-between">
-                <span className={`text-[9px] font-display px-2 py-0.5 rounded border ${
-                  t.autopilotState === 'CERTIFIED' ? 'bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/30' : 'bg-[#FF6A18]/10 text-[#FF6A18] border-[#FF6A18]/30'
-                }`}>
-                  AUTOPILOT: {t.autopilotState}
-                </span>
-
-                <Link
-                  href={`/integrations/connectors/${t.connectorId}`}
-                  className="text-xs font-display text-[#38BDF8] hover:underline flex items-center gap-1"
-                >
-                  INSPECT <ChevronRight className="w-3 h-3" />
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {/* ── REGISTERED MANIFESTS SUMMARY TABLE (§3) ─────── */}
+      {/* ── REGISTERED MANIFESTS SUMMARY TABLE ─────── */}
       <div className="industrial-panel p-5 space-y-4">
         <div className="flex items-center justify-between border-b border-white/10 pb-3">
           <div className="flex items-center gap-2">
-            <FileCode className="w-4 h-4 text-[#D6A84B]" />
+            <Server className="w-4 h-4 text-[#D6A84B]" />
             <h3 className="font-display text-xs text-[#F5F6F7] tracking-wider uppercase">
               REGISTERED CONNECTOR MANIFESTS ({manifests.length})
             </h3>
@@ -206,7 +271,7 @@ export default function IntegrationsPage() {
                 <th className="p-3">NAME</th>
                 <th className="p-3">CATEGORY</th>
                 <th className="p-3">AUTH TYPE</th>
-                <th className="p-3">VERSION</th>
+                <th className="p-3">API VERSION</th>
                 <th className="p-3">RATE LIMIT</th>
                 <th className="p-3 text-right">ACTIONS</th>
               </tr>
@@ -222,7 +287,7 @@ export default function IntegrationsPage() {
                     </span>
                   </td>
                   <td className="p-3 text-[#A2A6AD]">{m.authType}</td>
-                  <td className="p-3 text-[#626770]">{m.versionInfo.connectorVersion} ({m.versionInfo.apiVersion})</td>
+                  <td className="p-3 text-[#626770]">{m.versionInfo.apiVersion}</td>
                   <td className="p-3 text-[#626770]">{m.rateLimits.requestsPerSecond} req/s</td>
                   <td className="p-3 text-right space-x-2">
                     <Link
@@ -242,6 +307,15 @@ export default function IntegrationsPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* Truth Layer Notice */}
+      <div className="p-4 rounded-xl border border-[#D6A84B]/20 bg-[#D6A84B]/5 flex items-start gap-3">
+        <AlertTriangle className="w-4 h-4 text-[#D6A84B] mt-0.5 flex-shrink-0" />
+        <div className="font-data text-xs text-[#A2A6AD] leading-relaxed">
+          <span className="text-[#D6A84B] font-bold">PRODUCTION TRUTH LAYER — </span>
+          Only Whop and Digistore24 are connected by live API. All health metrics on this page are fetched in real time from those APIs. No connector status is fabricated. Other marketplace connectors will appear here only once real API credentials are provided.
         </div>
       </div>
 

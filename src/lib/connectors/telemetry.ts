@@ -1,9 +1,9 @@
 /**
  * DRAWDOWN OS — PRODUCTION TELEMETRY ENGINE
- * 
- * Provides dynamic telemetry from environment configurations and database records.
+ *
+ * Provides dynamic telemetry from environment configurations.
  * Never fabricates numbers, status, or timestamps.
- * Whop is the single connected marketplace API.
+ * Whop and Digistore24 are the only connected marketplace APIs.
  */
 
 import { checkMarketplaceConnectionStatus } from '@/lib/config/env';
@@ -27,6 +27,11 @@ export async function fetchLiveChannelStates(): Promise<LiveChannelState[]> {
   const whopCheck = checkMarketplaceConnectionStatus('whop');
   const whopStatus = whopCheck.isConfigured ? 'CONNECTED' : 'NOT_CONFIGURED';
 
+  // Digistore24 — check env key presence
+  const ds24ApiKey = process.env.DIGISTORE24_API_KEY;
+  const ds24Configured = Boolean(ds24ApiKey);
+  const ds24Status: LiveChannelState['status'] = ds24Configured ? 'CONNECTED' : 'NOT_CONFIGURED';
+
   return [
     {
       id: 'whop',
@@ -43,44 +48,18 @@ export async function fetchLiveChannelStates(): Promise<LiveChannelState[]> {
       },
     },
     {
-      id: 'gumroad',
-      name: 'Gumroad Storefront',
+      id: 'digistore24',
+      name: 'Digistore24 Marketplace',
       type: 'Direct API',
-      status: 'NOT_CONFIGURED',
-      statusLabel: 'NOT CONNECTED',
-      metrics: { Distribution: 'Not Connected', Revenue: '—', Orders: '—', Traffic: '—', 'Affiliate Sales': '—' },
-    },
-    {
-      id: 'etsy',
-      name: 'Etsy Digital Shop',
-      type: 'Manual Portal',
-      status: 'NOT_CONFIGURED',
-      statusLabel: 'NOT CONNECTED',
-      metrics: { Distribution: 'Not Connected', Revenue: '—', Orders: '—', Traffic: '—', 'Affiliate Sales': '—' },
-    },
-    {
-      id: 'payhip',
-      name: 'Payhip Shop',
-      type: 'Direct API',
-      status: 'NOT_CONFIGURED',
-      statusLabel: 'NOT CONNECTED',
-      metrics: { Distribution: 'Not Connected', Revenue: '—', Orders: '—', Traffic: '—', 'Affiliate Sales': '—' },
-    },
-    {
-      id: 'amazon',
-      name: 'Amazon Kindle Direct',
-      type: 'Direct Retailer',
-      status: 'NOT_CONFIGURED',
-      statusLabel: 'NOT CONNECTED',
-      metrics: { Distribution: 'Not Connected', Revenue: '—', Orders: '—', Traffic: '—', 'Affiliate Sales': '—' },
-    },
-    {
-      id: 'publishdrive',
-      name: 'PublishDrive Aggregator',
-      type: 'Aggregator Hub',
-      status: 'NOT_CONFIGURED',
-      statusLabel: 'NOT CONNECTED',
-      metrics: { Distribution: 'Not Connected', Revenue: '—', Orders: '—', Traffic: '—', 'Affiliate Sales': '—' },
+      status: ds24Status,
+      statusLabel: ds24Configured ? 'CONNECTED (LIVE API)' : 'NOT CONNECTED',
+      metrics: {
+        Distribution: ds24Configured ? 'Live API Connected' : 'Not Connected',
+        Revenue: '—',
+        Orders: '—',
+        Traffic: '—',
+        'Affiliate Sales': '—',
+      },
     },
   ];
 }
