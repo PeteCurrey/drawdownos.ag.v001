@@ -152,7 +152,7 @@ function getMarketplaceConfigs(): MarketplaceEnvConfig {
 export function checkMarketplaceConnectionStatus(marketplaceId: string): {
   id: string;
   isConfigured: boolean;
-  status: 'CONNECTED' | 'MISSING_KEYS' | 'MOCK_MODE';
+  status: 'CONNECTED' | 'MISSING_KEYS' | 'NOT_CONFIGURED';
   keyRequired: string;
 } {
   const normalized = marketplaceId.toLowerCase();
