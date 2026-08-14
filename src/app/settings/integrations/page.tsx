@@ -20,10 +20,10 @@ const INTEGRATIONS = [
 
 function StatusBadge({ status }: { status: IntegrationState['status'] }) {
   const map = {
-    NOT_CONFIGURED: { label: 'Not configured', color: 'text-[#626770]', bg: 'bg-white/5 border-white/10' },
-    CONFIGURED: { label: 'Configured', color: 'text-[#D6A84B]', bg: 'bg-[#D6A84B]/10 border-[#D6A84B]/30' },
-    CONNECTED: { label: 'Connected', color: 'text-[#22C55E]', bg: 'bg-[#22C55E]/10 border-[#22C55E]/30' },
-    ERROR: { label: 'Error', color: 'text-[#EF4444]', bg: 'bg-[#EF4444]/10 border-[#EF4444]/30' },
+    NOT_CONFIGURED: { label: 'Not configured', color: 'text-[#6B7280]', bg: 'bg-gray-100 border-gray-200' },
+    CONFIGURED:    { label: 'Configured',     color: 'text-[#1E3A5F]', bg: 'bg-[#1E3A5F]/10 border-[#1E3A5F]/20' },
+    CONNECTED:     { label: 'Connected',      color: 'text-[#166534]', bg: 'bg-green-50 border-green-200' },
+    ERROR:         { label: 'Error',          color: 'text-[#B91C1C]', bg: 'bg-red-50 border-red-200' },
   };
   const s = map[status];
   return (
@@ -55,14 +55,14 @@ export default function IntegrationsSettingsPage() {
   }, []);
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-        <Link href="/settings" className="text-[#626770] hover:text-[#A2A6AD] transition-colors">
-          <ArrowLeft className="w-4 h-4" />
+    <div className="space-y-6 pb-16">
+      <div className="flex items-center gap-3 border-b border-black/8 pb-4">
+        <Link href="/settings" className="text-[#6B7280] hover:text-[#3D4452] transition-colors">
+          <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-xl font-bold tracking-wider text-[#F5F6F7] uppercase">INTEGRATIONS</h1>
-          <p className="text-sm text-[#A2A6AD] mt-0.5">API marketplace connections.</p>
+          <h1 className="font-display text-xl text-[#0D0F12] font-bold tracking-wider">INTEGRATION SETTINGS</h1>
+          <p className="text-xs text-[#6B7280] font-mono mt-0.5">Live API connection status for Whop and Digistore24</p>
         </div>
       </div>
 
@@ -75,64 +75,62 @@ export default function IntegrationsSettingsPage() {
             <div key={integration.id} className="industrial-panel p-5 space-y-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <h2 className="text-sm font-bold tracking-wider text-[#F5F6F7] uppercase">{integration.name}</h2>
-                  <p className="text-xs text-[#626770] mt-0.5">{integration.description}</p>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-sm font-bold text-[#0D0F12]">{integration.name}</h2>
+                    {state && <StatusBadge status={state.status} />}
+                    {isLoading && <Loader2 className="w-3.5 h-3.5 text-[#6B7280] animate-spin" />}
+                  </div>
+                  <p className="text-xs text-[#6B7280] mt-1">{integration.description}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  {isLoading ? (
-                    <Loader2 className="w-4 h-4 text-[#626770] animate-spin" />
-                  ) : state ? (
-                    <StatusBadge status={state.status} />
-                  ) : null}
-                </div>
-              </div>
-
-              {state && !state.configured && (
-                <div className="text-xs text-[#626770] bg-[#0D0E11] p-3 rounded font-mono">
-                  Required: {integration.requiredKey}
-                </div>
-              )}
-
-              {state && state.error && (
-                <div className="text-xs text-[#EF4444] bg-[#EF4444]/5 border border-[#EF4444]/20 p-3 rounded">
-                  {state.error}
-                </div>
-              )}
-
-              {state && state.lastVerifiedAt && (
-                <div className="text-xs text-[#626770]">
-                  Last verified: {new Date(state.lastVerifiedAt).toLocaleString('en-GB')}
-                </div>
-              )}
-
-              <div className="flex items-center gap-2 pt-1">
                 <button
                   onClick={() => checkIntegration(integration.id, integration.endpoint)}
                   disabled={isLoading}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded border border-white/10 hover:border-white/20 text-xs text-[#A2A6AD] hover:text-[#F5F6F7] transition-all disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded border border-black/10 text-xs font-mono text-[#3D4452] hover:bg-[#F4F5F7] disabled:opacity-50 transition-colors"
                 >
                   <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
                   TEST CONNECTION
                 </button>
-                <a
-                  href={integration.portalUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-3 py-1.5 rounded border border-white/10 hover:border-white/20 text-xs text-[#626770] hover:text-[#A2A6AD] transition-all"
-                >
-                  OPEN PORTAL ↗
-                </a>
+              </div>
+
+              {state && (
+                <div className="space-y-2 font-mono text-xs">
+                  {state.error && (
+                    <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-[#B91C1C]">
+                      <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                      {state.error}
+                    </div>
+                  )}
+                  {state.status === 'CONNECTED' && (
+                    <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-[#166534]">
+                      <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                      Live API connection verified.
+                    </div>
+                  )}
+                  {state.metadata && Object.keys(state.metadata).length > 0 && (
+                    <div className="p-3 bg-[#F4F5F7] rounded-lg space-y-1 text-[11px]">
+                      {Object.entries(state.metadata).map(([k, v]) => (
+                        <div key={k} className="flex gap-2">
+                          <span className="text-[#6B7280] min-w-32">{k}:</span>
+                          <span className="text-[#0D0F12]">{String(v)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="flex items-center gap-3 pt-2 border-t border-black/6 text-xs font-mono">
+                <div className="p-2 bg-[#F4F5F7] rounded flex-1">
+                  <span className="text-[#6B7280]">Required env var: </span>
+                  <code className="text-[#1E3A5F] font-bold">{integration.requiredKey}</code>
+                  <span className="text-[#9CA3AF]"> in .env.local</span>
+                </div>
+                <a href={integration.portalUrl} target="_blank" rel="noreferrer" className="text-[#1E3A5F] hover:underline">DASHBOARD ↗</a>
+                <a href={integration.docsUrl} target="_blank" rel="noreferrer" className="text-[#6B7280] hover:text-[#3D4452]">DOCS ↗</a>
               </div>
             </div>
           );
         })}
-      </div>
-
-      <div className="p-4 rounded-lg border border-[#D6A84B]/20 bg-[#D6A84B]/5">
-        <p className="text-xs text-[#A2A6AD] leading-relaxed">
-          <span className="text-[#D6A84B] font-bold">CONNECTED</span> is only shown after a real successful API call.
-          Credentials are stored in server environment variables and are never sent to the browser.
-        </p>
       </div>
     </div>
   );

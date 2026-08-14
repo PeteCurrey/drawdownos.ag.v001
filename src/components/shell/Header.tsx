@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -29,18 +29,18 @@ export default function Header() {
       : pathname.startsWith(href);
 
   return (
-    <header className="sticky top-0 z-40 bg-[#0A0B0D]/95 backdrop-blur border-b border-white/10">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-black/8 shadow-sm">
       <div className="max-w-[1600px] mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between h-14 gap-6">
 
           {/* Wordmark */}
           <Link href="/dashboard" className="flex items-center gap-3 shrink-0 group">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-b from-[#1C1F24] to-[#121418] border border-[#D6A84B]/40 flex items-center justify-center group-hover:border-[#D6A84B] transition-colors">
-              <span className="font-mono text-xs text-[#D6A84B] font-bold">DD</span>
+            <div className="w-7 h-7 rounded-lg bg-[#1E3A5F] flex items-center justify-center group-hover:bg-[#162d4a] transition-colors">
+              <span className="font-mono text-xs text-white font-bold">DD</span>
             </div>
             <div className="hidden sm:flex flex-col leading-none">
-              <span className="text-xs font-bold tracking-[0.12em] text-[#F5F6F7] uppercase">DRAWDOWN OS</span>
-              <span className="text-[9px] text-[#626770] tracking-wider uppercase">Publishing Engine</span>
+              <span className="text-xs font-bold tracking-[0.12em] text-[#0D0F12] uppercase">DRAWDOWN OS</span>
+              <span className="text-[9px] text-[#6B7280] tracking-wider uppercase">Publishing Engine</span>
             </div>
           </Link>
 
@@ -55,8 +55,8 @@ export default function Header() {
                   href={item.href}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold tracking-wider whitespace-nowrap transition-all ${
                     active
-                      ? 'text-[#D6A84B] bg-[#D6A84B]/10'
-                      : 'text-[#626770] hover:text-[#A2A6AD] hover:bg-white/5'
+                      ? 'text-[#1E3A5F] bg-[#1E3A5F]/10'
+                      : 'text-[#6B7280] hover:text-[#3D4452] hover:bg-black/5'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -70,7 +70,7 @@ export default function Header() {
           <div className="flex items-center gap-2 shrink-0">
             <Link
               href="/library/new"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D6A84B] hover:bg-[#e2b558] text-[#0A0B0D] text-xs font-bold tracking-wider transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1E3A5F] hover:bg-[#162d4a] text-white text-xs font-bold tracking-wider transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">ADD PUBLICATION</span>
