@@ -1,73 +1,41 @@
-'use client';
-
 import React from 'react';
-import { Settings, ShieldCheck, Key, Server, Lock, UserCheck } from 'lucide-react';
+import Link from 'next/link';
+import { Database, Plug, Globe, HardDrive, Settings as SettingsIcon } from 'lucide-react';
+
+const SETTINGS_SECTIONS = [
+  { title: 'General', href: '/settings/general', icon: SettingsIcon, description: 'Application preferences and defaults.' },
+  { title: 'Storage', href: '/settings/storage', icon: HardDrive, description: 'Cloudflare R2 storage configuration and status.' },
+  { title: 'Integrations', href: '/settings/integrations', icon: Plug, description: 'API marketplace connections and status.' },
+  { title: 'Marketplaces', href: '/settings/marketplaces', icon: Globe, description: 'Marketplace registry management.' },
+  { title: 'Data', href: '/settings/data', icon: Database, description: 'Import, export and database management.' },
+];
 
 export default function SettingsPage() {
   return (
-    <div className="space-y-6 pb-16">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="font-display text-xl text-[#F5F6F7] font-bold tracking-wider">PLATFORM SETTINGS & SECURITY</h1>
-            <span className="text-[10px] font-data text-[#22C55E] px-2 py-0.5 rounded bg-[#22C55E]/10 border border-[#22C55E]/30">
-              SECURITY SECURE
-            </span>
-          </div>
-          <p className="text-xs text-[#A2A6AD] font-data mt-1">
-            Supabase RLS configurations, Cloudflare R2 bucket policies, encrypted secret management, and RBAC user roles
-          </p>
-        </div>
+    <div className="space-y-6">
+      <div className="border-b border-white/10 pb-4">
+        <h1 className="text-xl font-bold tracking-wider text-[#F5F6F7] uppercase">SETTINGS</h1>
+        <p className="text-sm text-[#A2A6AD] mt-1">Configuration, storage, integrations and data management.</p>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        {/* Security & Access Controls */}
-        <div className="industrial-panel p-5 space-y-4">
-          <div className="flex items-center gap-2 text-[#D6A84B]">
-            <ShieldCheck className="w-5 h-5" />
-            <h3 className="font-display text-sm font-bold text-[#F5F6F7]">SECURITY & RLS POLICIES</h3>
-          </div>
-
-          <div className="space-y-2.5 font-data text-xs text-[#A2A6AD]">
-            <div className="p-3 bg-[#0D0E11] rounded border border-white/5 flex justify-between items-center">
-              <span>Supabase Row Level Security (RLS)</span>
-              <span className="text-[#22C55E] font-bold">ENABLED</span>
-            </div>
-            <div className="p-3 bg-[#0D0E11] rounded border border-white/5 flex justify-between items-center">
-              <span>Server-Side Credential Isolation</span>
-              <span className="text-[#22C55E] font-bold">ACTIVE</span>
-            </div>
-            <div className="p-3 bg-[#0D0E11] rounded border border-white/5 flex justify-between items-center">
-              <span>Signed R2 URL Expiry Default</span>
-              <span className="text-[#D6A84B] font-bold">3600s (1 HR)</span>
-            </div>
-            <div className="p-3 bg-[#0D0E11] rounded border border-white/5 flex justify-between items-center">
-              <span>Immutable Audit Trail Logging</span>
-              <span className="text-[#22C55E] font-bold">STRICT APPEND-ONLY</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Storage Provider Configurations */}
-        <div className="industrial-panel p-5 space-y-4">
-          <div className="flex items-center gap-2 text-[#38BDF8]">
-            <Server className="w-5 h-5" />
-            <h3 className="font-display text-sm font-bold text-[#F5F6F7]">CLOUDFLARE R2 BUCKET CONFIGURATION</h3>
-          </div>
-
-          <div className="space-y-2.5 font-data text-xs text-[#A2A6AD]">
-            <div className="p-3 bg-[#0D0E11] rounded border border-white/5">
-              <span className="text-[#626770] text-[10px] block">PRODUCTION BUCKET:</span>
-              <span className="text-[#F5F6F7] font-bold">drawdown-os-assets-production</span>
-            </div>
-            <div className="p-3 bg-[#0D0E11] rounded border border-white/5">
-              <span className="text-[#626770] text-[10px] block">CUSTOM ASSETS DOMAIN:</span>
-              <span className="text-[#38BDF8] font-bold">https://assets.drawdown.os</span>
-            </div>
-          </div>
-        </div>
-
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {SETTINGS_SECTIONS.map((section) => {
+          const Icon = section.icon;
+          return (
+            <Link
+              key={section.href}
+              href={section.href}
+              className="industrial-panel p-5 hover:border-white/20 transition-all group"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-[#D6A84B]/10 border border-[#D6A84B]/20 flex items-center justify-center">
+                  <Icon className="w-4 h-4 text-[#D6A84B]" />
+                </div>
+                <h2 className="text-sm font-bold tracking-wider text-[#F5F6F7] group-hover:text-[#D6A84B] transition-colors uppercase">{section.title}</h2>
+              </div>
+              <p className="text-xs text-[#626770] leading-relaxed">{section.description}</p>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

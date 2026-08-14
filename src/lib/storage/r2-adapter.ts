@@ -1,101 +1,212 @@
-// CLOUDFLARE R2 OBJECT STORAGE ADAPTER INTERFACE & IMPLEMENTATION
-// Handles secure storage of master PDFs, EPUBs, covers, audio, sales reports, and print masters.
+/**
+ * DRAWDOWN OS — CLOUDFLARE R2 STORAGE ADAPTER
+ * Uses AWS SDK v3 with Cloudflare R2 S3-compatible API.
+ * This is SERVER-SIDE ONLY. Never import from client components.
+ *
+ * Required environment variables:
+ *   R2_ENDPOINT          — https://<account-id>.r2.cloudflarestorage.com
+ *   R2_ACCESS_KEY_ID     — R2 access key
+ *   R2_SECRET_ACCESS_KEY — R2 secret key
+ *   R2_BUCKET_NAME       — bucket name
+ */
+
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  HeadObjectCommand,
+  GetObjectCommand,
+  ListObjectsV2Command,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+
+export class StorageNotConfiguredError extends Error {
+  constructor() {
+    super(
+      'Cloudflare R2 is not configured. Set R2_ENDPOINT, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, and R2_BUCKET_NAME in your environment.'
+    );
+    this.name = 'StorageNotConfiguredError';
+  }
+}
 
 export interface StorageObjectMetadata {
   key: string;
   fileName: string;
   sizeBytes: number;
   mimeType: string;
-  sha256Checksum: string;
-  uploadedAt: string;
+  checksum?: string;
   eTag?: string;
+  lastModified?: string;
 }
 
-export interface SignedUrlOptions {
-  expiresInSeconds?: number;
-  downloadFilename?: string;
-  disposition?: 'inline' | 'attachment';
+export interface StorageStatus {
+  configured: boolean;
+  connected: boolean;
+  bucketName: string | null;
+  endpoint: string | null;
+  error?: string;
 }
 
-export interface StorageAdapter {
-  uploadObject(key: string, data: Blob | Buffer | ArrayBuffer, mimeType: string, meta?: Record<string, string>): Promise<StorageObjectMetadata>;
-  getSignedDownloadUrl(key: string, options?: SignedUrlOptions): Promise<string>;
-  getSignedUploadUrl(key: string, contentType: string, options?: SignedUrlOptions): Promise<string>;
-  deleteObject(key: string): Promise<boolean>;
-  getObjectMetadata(key: string): Promise<StorageObjectMetadata | null>;
-  calculateSHA256(data: ArrayBuffer): Promise<string>;
-}
+function getR2Client(): S3Client {
+  const endpoint = process.env.R2_ENDPOINT;
+  const accessKeyId = process.env.R2_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
 
-class CloudflareR2Adapter implements StorageAdapter {
-  private bucketName: string;
-  private accountId: string;
-  private accessKeyId: string;
-
-  constructor() {
-    this.bucketName = process.env.R2_BUCKET_NAME || 'drawdown-os-assets-production';
-    this.accountId = process.env.R2_ACCOUNT_ID || 'mock_r2_account_id';
-    this.accessKeyId = process.env.R2_ACCESS_KEY_ID || 'mock_r2_access_key_id';
+  if (!endpoint || !accessKeyId || !secretAccessKey) {
+    throw new StorageNotConfiguredError();
   }
 
-  async uploadObject(
-    key: string,
-    data: Blob | Buffer | ArrayBuffer,
-    mimeType: string,
-    meta?: Record<string, string>
-  ): Promise<StorageObjectMetadata> {
-    // In production, uses AWS S3 SDK with R2 endpoint: https://<account_id>.r2.cloudflarestorage.com
-    const buffer = data instanceof ArrayBuffer ? data : (data as any).buffer || new ArrayBuffer(0);
-    const sha256 = await this.calculateSHA256(buffer);
-    const sizeBytes = buffer.byteLength || (data as any).size || 0;
+  return new S3Client({
+    region: 'auto',
+    endpoint,
+    credentials: { accessKeyId, secretAccessKey },
+  });
+}
 
+function getBucketName(): string {
+  const bucket = process.env.R2_BUCKET_NAME;
+  if (!bucket) throw new StorageNotConfiguredError();
+  return bucket;
+}
+
+export function isStorageConfigured(): boolean {
+  return Boolean(
+    process.env.R2_ENDPOINT &&
+    process.env.R2_ACCESS_KEY_ID &&
+    process.env.R2_SECRET_ACCESS_KEY &&
+    process.env.R2_BUCKET_NAME
+  );
+}
+
+export async function getStorageStatus(): Promise<StorageStatus> {
+  if (!isStorageConfigured()) {
     return {
-      key,
-      fileName: key.split('/').pop() || 'file',
-      sizeBytes,
-      mimeType,
-      sha256Checksum: sha256,
-      uploadedAt: new Date().toISOString(),
-      eTag: `"${sha256.substring(0, 16)}"`
+      configured: false,
+      connected: false,
+      bucketName: null,
+      endpoint: null,
+      error: 'R2 credentials not configured.',
     };
   }
 
-  async getSignedDownloadUrl(key: string, options: SignedUrlOptions = {}): Promise<string> {
-    const expiresIn = options.expiresInSeconds || 3600; // 1 hour default expiry
-    const baseUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN || 'https://assets.drawdown.os';
-    const token = Buffer.from(`${key}:${Date.now() + expiresIn * 1000}`).toString('hex');
-    return `${baseUrl}/${key}?token=${token}&expires=${expiresIn}&disposition=${options.disposition || 'attachment'}`;
-  }
-
-  async getSignedUploadUrl(key: string, contentType: string, options: SignedUrlOptions = {}): Promise<string> {
-    const baseUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_DOMAIN || 'https://upload.drawdown.os';
-    return `${baseUrl}/upload/${key}?contentType=${encodeURIComponent(contentType)}&expires=900`;
-  }
-
-  async deleteObject(key: string): Promise<boolean> {
-    console.log(`[R2 ADAPTER] Soft-deleted or purged key: ${key}`);
-    return true;
-  }
-
-  async getObjectMetadata(key: string): Promise<StorageObjectMetadata | null> {
+  try {
+    const client = getR2Client();
+    const bucket = getBucketName();
+    await client.send(new ListObjectsV2Command({ Bucket: bucket, MaxKeys: 1 }));
     return {
-      key,
-      fileName: key.split('/').pop() || 'master.pdf',
-      sizeBytes: 14850920, // 14.8 MB
-      mimeType: 'application/pdf',
-      sha256Checksum: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-      uploadedAt: new Date().toISOString()
+      configured: true,
+      connected: true,
+      bucketName: bucket,
+      endpoint: process.env.R2_ENDPOINT ?? null,
     };
-  }
-
-  async calculateSHA256(data: ArrayBuffer): Promise<string> {
-    if (typeof crypto !== 'undefined' && crypto.subtle) {
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-    // Fallback pseudo-hash for server side mock verification
-    return 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+  } catch (err) {
+    return {
+      configured: true,
+      connected: false,
+      bucketName: process.env.R2_BUCKET_NAME ?? null,
+      endpoint: process.env.R2_ENDPOINT ?? null,
+      error: err instanceof Error ? err.message : 'R2 connection failed.',
+    };
   }
 }
 
-export const r2Storage = new CloudflareR2Adapter();
+export async function uploadObject(
+  key: string,
+  data: Buffer | Uint8Array,
+  mimeType: string,
+  meta?: Record<string, string>
+): Promise<StorageObjectMetadata> {
+  const client = getR2Client();
+  const bucket = getBucketName();
+
+  await client.send(
+    new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Body: data,
+      ContentType: mimeType,
+      Metadata: meta,
+    })
+  );
+
+  const head = await client.send(new HeadObjectCommand({ Bucket: bucket, Key: key }));
+
+  return {
+    key,
+    fileName: key.split('/').pop() ?? key,
+    sizeBytes: head.ContentLength ?? data.byteLength,
+    mimeType: head.ContentType ?? mimeType,
+    eTag: head.ETag,
+    lastModified: head.LastModified?.toISOString(),
+  };
+}
+
+export async function getObjectMetadata(key: string): Promise<StorageObjectMetadata | null> {
+  try {
+    const client = getR2Client();
+    const bucket = getBucketName();
+    const head = await client.send(new HeadObjectCommand({ Bucket: bucket, Key: key }));
+    return {
+      key,
+      fileName: key.split('/').pop() ?? key,
+      sizeBytes: head.ContentLength ?? 0,
+      mimeType: head.ContentType ?? 'application/octet-stream',
+      eTag: head.ETag,
+      lastModified: head.LastModified?.toISOString(),
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function objectExists(key: string): Promise<boolean> {
+  const meta = await getObjectMetadata(key);
+  return meta !== null;
+}
+
+export async function getSignedDownloadUrl(
+  key: string,
+  expiresInSeconds = 3600
+): Promise<string> {
+  const client = getR2Client();
+  const bucket = getBucketName();
+  const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+  return getSignedUrl(client, command, { expiresIn: expiresInSeconds });
+}
+
+export async function getSignedUploadUrl(
+  key: string,
+  contentType: string,
+  expiresInSeconds = 900
+): Promise<string> {
+  const client = getR2Client();
+  const bucket = getBucketName();
+  const command = new PutObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    ContentType: contentType,
+  });
+  return getSignedUrl(client, command, { expiresIn: expiresInSeconds });
+}
+
+export async function deleteObject(key: string): Promise<void> {
+  const client = getR2Client();
+  const bucket = getBucketName();
+  await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
+}
+
+/**
+ * R2 object key conventions
+ */
+export function buildObjectKey(
+  publicationId: string,
+  role: 'masters' | 'covers' | 'previews' | 'epub' | 'kpf' | 'other',
+  version: string,
+  filename: string
+): string {
+  const safe = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+  if (role === 'covers' || role === 'previews' || role === 'other') {
+    return `publications/${publicationId}/${role}/${safe}`;
+  }
+  return `publications/${publicationId}/${role}/${version}/${safe}`;
+}
